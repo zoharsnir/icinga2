@@ -22,6 +22,8 @@
 #include "remote/endpoint.hpp"
 #include "icinga/cib.hpp"
 #include "icinga/service.hpp"
+#include "icinga/checkcommand.hpp"
+#include "icinga/macroprocessor.hpp"
 #include "icinga/icingaapplication.hpp"
 #include "base/application.hpp"
 #include "base/objectlock.hpp"
@@ -41,9 +43,6 @@ void ClusterCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRe
 	REQUIRE_NOT_NULL(checkable);
 	REQUIRE_NOT_NULL(cr);
 
-	if (resolvedMacros && !useResolvedMacros)
-		return;
-
 	ApiListener::Ptr listener = ApiListener::GetInstance();
 
 	if (!listener) {
@@ -53,6 +52,28 @@ void ClusterCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRe
 		return;
 	}
 
+	bool useLocalZone = false;
+
+	CheckCommand::Ptr commandObj = checkable->GetCheckCommand();
+	Value raw_command = commandObj->GetCommandLine();
+
+	Host::Ptr host;
+	Service::Ptr service;
+	tie(host, service) = GetHostService(checkable);
+
+	MacroProcessor::ResolverList resolvers;
+	if (service)
+		resolvers.emplace_back("service", service);
+	resolvers.emplace_back("host", host);
+	resolvers.emplace_back("command", commandObj);
+	resolvers.emplace_back("icinga", IcingaApplication::GetInstance());
+
+	useLocalZone = MacroProcessor::ResolveMacros("$cluster_use_local_zone$", resolvers, checkable->GetLastCheckResult(),
+		nullptr, MacroProcessor::EscapeCallback(), resolvedMacros, useResolvedMacros);
+
+	if (resolvedMacros && !useResolvedMacros)
+		return;
+
 	std::pair<Dictionary::Ptr, Dictionary::Ptr> stats = listener->GetStatus();
 
 	Dictionary::Ptr status = stats.first;
@@ -61,19 +82,35 @@ void ClusterCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRe
 	std::pair<Dictionary::Ptr, Array::Ptr> feature_stats = CIB::GetFeatureStats();
 	cr->SetPerformanceData(feature_stats.second);
 
-	int numConnEndpoints = status->Get("num_conn_endpoints");
-	int numNotConnEndpoints = status->Get("num_not_conn_endpoints");
+	int numConnEndpoints;
+	int numNotConnEndpoints;
+	Array::Ptr connEndpoints;
+	Array::Ptr notConnEndpoints;
+
+	if (useLocalZone) {
+		numConnEndpoints = status->Get("num_local_zone_conn_endpoints");
+		numNotConnEndpoints = status->Get("num_local_zone_not_conn_endpoints");
+		connEndpoints = status->Get("local_zone_conn_endpoints");
+		notConnEndpoints = status->Get("local_zone_not_conn_endpoints");
+	} else {
+		numConnEndpoints = status->Get("num_conn_endpoints");
+		numNotConnEndpoints = status->Get("num_not_conn_endpoints");
+		connEndpoints = status->Get("conn_endpoints");
+		notConnEndpoints = status->Get("not_conn_endpoints");
+	}
 
 	String output = "Icinga 2 Cluster";
 
+	output += " (Local zone: '" + Zone::GetLocalZone()->GetName() + "')";
+
 	if (numNotConnEndpoints > 0) {
 		output += " Problem: " + Convert::ToString(numNotConnEndpoints) + " endpoints are not connected.";
-		output += "\n(" + FormatArray(status->Get("not_conn_endpoints")) + ")";
+		output += "\n(" + FormatArray(notConnEndpoints) + ")";
 
 		cr->SetState(ServiceCritical);
 	} else {
 		output += " OK: " + Convert::ToString(numConnEndpoints) + " endpoints are connected.";
-		output += "\n(" + FormatArray(status->Get("conn_endpoints")) + ")";
+		output += "\n(" + FormatArray(connEndpoints) + ")";
 
 		cr->SetState(ServiceOK);
 	}

@@ -1237,27 +1237,32 @@ std::pair<Dictionary::Ptr, Dictionary::Ptr> ApiListener::GetStatus()
 	double allEndpoints = 0;
 	Array::Ptr allNotConnectedEndpoints = new Array();
 	Array::Ptr allConnectedEndpoints = new Array();
+	Array::Ptr allLocalZoneNotConnectedEndpoints = new Array();
+	Array::Ptr allLocalZoneConnectedEndpoints = new Array();
 
-	Zone::Ptr my_zone = Zone::GetLocalZone();
+	Zone::Ptr localZone = Zone::GetLocalZone();
 
 	Dictionary::Ptr connectedZones = new Dictionary();
 
 	for (const Zone::Ptr& zone : ConfigType::GetObjectsByType<Zone>()) {
 		/* only check endpoints in a) the same zone b) our parent zone c) immediate child zones */
-		if (my_zone != zone && my_zone != zone->GetParent() && zone != my_zone->GetParent()) {
+		if (localZone != zone && localZone != zone->GetParent() && zone != localZone->GetParent()) {
 			Log(LogDebug, "ApiListener")
 				<< "Not checking connection to Zone '" << zone->GetName() << "' because it's not in the same zone, a parent or a child zone.";
 			continue;
 		}
 
 		bool zoneConnected = false;
+		bool localZoneConnected = false;
 		int countZoneEndpoints = 0;
 		double zoneLag = 0;
 
 		ArrayData zoneEndpoints;
 
 		for (const Endpoint::Ptr& endpoint : zone->GetEndpoints()) {
-			zoneEndpoints.emplace_back(endpoint->GetName());
+			String endpointName = endpoint->GetName();
+
+			zoneEndpoints.emplace_back(endpointName);
 
 			if (endpoint->GetName() == GetIdentity())
 				continue;
@@ -1271,16 +1276,29 @@ std::pair<Dictionary::Ptr, Dictionary::Ptr> ApiListener::GetStatus()
 			countZoneEndpoints++;
 
 			if (!endpoint->GetConnected()) {
-				allNotConnectedEndpoints->Add(endpoint->GetName());
+				allNotConnectedEndpoints->Add(endpointName);
 			} else {
-				allConnectedEndpoints->Add(endpoint->GetName());
+				allConnectedEndpoints->Add(endpointName);
 				zoneConnected = true;
+
+			}
+
+			/* Store local zone endpoints. */
+			if (localZone == zone) {
+				if (!endpoint->GetConnected()) {
+					allLocalZoneNotConnectedEndpoints->Add(endpointName);
+				} else {
+					allLocalZoneConnectedEndpoints->Add(endpointName);
+					localZoneConnected = true;
+				}
 			}
 		}
 
 		/* if there's only one endpoint inside the zone, we're not connected - that's us, fake it */
-		if (zone->GetEndpoints().size() == 1 && countZoneEndpoints == 0)
+		if (zone->GetEndpoints().size() == 1 && countZoneEndpoints == 0) {
 			zoneConnected = true;
+			localZoneConnected = true;
+		}
 
 		String parentZoneName;
 		Zone::Ptr parentZone = zone->GetParent();
@@ -1316,6 +1334,11 @@ std::pair<Dictionary::Ptr, Dictionary::Ptr> ApiListener::GetStatus()
 		{ "conn_endpoints", allConnectedEndpoints },
 		{ "not_conn_endpoints", allNotConnectedEndpoints },
 
+		{ "num_local_zone_conn_endpoints", allLocalZoneConnectedEndpoints->GetLength() },
+		{ "num_local_zone_not_conn_endpoints", allLocalZoneNotConnectedEndpoints->GetLength() },
+		{ "local_zone_conn_endpoints", allLocalZoneConnectedEndpoints },
+		{ "local_zone_not_conn_endpoints", allLocalZoneNotConnectedEndpoints },
+
 		{ "zones", connectedZones },
 
 		{ "json_rpc", new Dictionary({
@@ -1338,6 +1361,8 @@ std::pair<Dictionary::Ptr, Dictionary::Ptr> ApiListener::GetStatus()
 	perfdata->Set("num_endpoints", allEndpoints);
 	perfdata->Set("num_conn_endpoints", Convert::ToDouble(allConnectedEndpoints->GetLength()));
 	perfdata->Set("num_not_conn_endpoints", Convert::ToDouble(allNotConnectedEndpoints->GetLength()));
+	perfdata->Set("num_local_zone_conn_endpoints", Convert::ToDouble(allLocalZoneConnectedEndpoints->GetLength()));
+	perfdata->Set("num_local_zone_not_conn_endpoints", Convert::ToDouble(allLocalZoneNotConnectedEndpoints->GetLength()));
 
 	perfdata->Set("num_json_rpc_clients", jsonRpcClients);
 	perfdata->Set("num_http_clients", httpClients);
