@@ -2100,6 +2100,11 @@ use the [nscp_api command](10-icinga-template-library.md#nscp-check-api) provide
 The initial setup for the NSClient++ API and the required arguments
 is the described in the ITL chapter for the [nscp_api](10-icinga-template-library.md#nscp-check-api) CheckCommand.
 
+> **Note**
+>
+> The examples below require Icinga 2 v2.9 and the bundled NSClient++ 0.5.2.39.
+> Older versions only support the `password` attribute, no user name or roles.
+
 Based on the [master with clients](06-distributed-monitoring.md#distributed-monitoring-master-clients)
 scenario we'll now add a local nscp check which queries the NSClient++ API to check the free disk space.
 
@@ -2114,7 +2119,8 @@ custom attribute and specify the drives to check.
         address = "192.168.56.111"
         vars.client_endpoint = name //follows the convention that host name == endpoint name
         vars.os_type = "Windows"
-        vars.nscp_api_password = "icinga"
+        vars.nscp_api_username = "icinga"
+        vars.nscp_api_password = "supersecret"
         vars.drives = [ "C:", "D:" ]
     }
 
@@ -2132,8 +2138,10 @@ rule based on `host.vars.drives`:
       //display_name = "nscp-drive-" + drive
 
       vars.nscp_api_host = "localhost"
-      vars.nscp_api_query = "check_drivesize"
+      vars.nscp_api_username = host.vars.nscp_api_username
       vars.nscp_api_password = host.vars.nscp_api_password
+
+      vars.nscp_api_query = "check_drivesize"
       vars.nscp_api_arguments = [ "drive=" +  drive ]
 
       ignore where host.vars.os_type != "Windows"
@@ -2169,7 +2177,8 @@ If you want to monitor specific Windows services, you could use the following ex
         address = "192.168.56.111"
         vars.client_endpoint = name //follows the convention that host name == endpoint name
         vars.os_type = "Windows"
-        vars.nscp_api_password = "icinga"
+        vars.nscp_api_username = "icinga"
+        vars.nscp_api_password = "supersecret"
         vars.services = [ "Windows Update", "wscsvc" ]
     }
 
@@ -2184,8 +2193,10 @@ If you want to monitor specific Windows services, you could use the following ex
       //display_name = "nscp-service-" + svc
 
       vars.nscp_api_host = "localhost"
-      vars.nscp_api_query = "check_service"
+      vars.nscp_api_username = host.vars.nscp_api_username
       vars.nscp_api_password = host.vars.nscp_api_password
+
+      vars.nscp_api_query = "check_service"
       vars.nscp_api_arguments = [ "service=" + svc ]
 
       ignore where host.vars.os_type != "Windows"

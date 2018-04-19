@@ -1723,8 +1723,41 @@ the `webserver` module enabled, configured and loaded.
 
 You can install the webserver using the following CLI commands:
 
-    ./nscp.exe web install
-    ./nscp.exe web password — –set icinga
+```
+nscp web install
+nscp web password --set icinga
+```
+
+> **Note**
+>
+> Keep this password secret and do not use it for remote access. Instead, create a new user
+> and assign a limited role to it. This feature is available with Icinga 2 v2.9 and NSClient++ 0.5.2.39.
+
+Add a new limited role:
+
+```
+nscp web add-role --role limited --grant info.get
+```
+
+Create a new user and assign the `limited` role.
+
+```
+nscp web add-user --user icinga --password supersecret --role limited
+```
+
+Verify the settings in the `nsclient.ini` file.
+
+```
+[/settings/WEB/server]
+password = icinga
+
+[/settings/WEB/server/users/icinga]
+password = supersecret
+role = limited
+
+[/settings/WEB/server/roles]
+limited = *
+```
 
 Now you can define specific [queries](https://docs.nsclient.org/reference/check/CheckHelpers.html#queries)
 and integrate them into Icinga 2.
@@ -1737,6 +1770,7 @@ Name                   | Description
 :----------------------|:----------------------
 nscp\_api\_host       | **Required**. NSCP API host address. Defaults to "$address$" if the host's `address` attribute is set, "$address6$" otherwise.
 nscp\_api\_port       | **Optional**. NSCP API port. Defaults to `8443`.
+nscp\_api\_username   | **Optional**. NSCP API username for basic auth and role assignment. Please check the NSCP documentation for setup details.
 nscp\_api\_password   | **Required**. NSCP API password. Please check the NSCP documentation for setup details.
 nscp\_api\_query      | **Required**. NSCP API query endpoint. Refer to the NSCP documentation for possible values.
 nscp\_api\_arguments  | **Optional**. NSCP API arguments dictionary either as single strings or key-value pairs using `=`. Refer to the NSCP documentation.
@@ -1745,7 +1779,7 @@ nscp\_api\_arguments  | **Optional**. NSCP API arguments dictionary either as si
 checks the CPU utilization and specifies warning and critical thresholds.
 
 ```
-check_nscp_api --host 10.0.10.148 --password icinga --query check_cpu --arguments show-all warning='load>40' critical='load>30'
+check_nscp_api --host 10.0.10.148 --username icinga --password supersecret --query check_cpu --arguments show-all warning='load>40' critical='load>30'
 check_cpu CRITICAL: critical(5m: 48%, 1m: 36%), 5s: 0% | 'total 5m'=48%;40;30 'total 1m'=36%;40;30 'total 5s'=0%;40;30
 ```
 
