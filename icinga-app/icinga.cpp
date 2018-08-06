@@ -299,8 +299,6 @@ static int Main()
 	Application::DeclareConst("Concurrency", std::thread::hardware_concurrency());
 	Application::DeclareConst("MaxConcurrentChecks", Application::GetDefaultMaxConcurrentChecks());
 
-	ScriptGlobal::Set("Environment", "production");
-
 	ScriptGlobal::Set("AttachDebugger", false);
 
 	ScriptGlobal::Set("PlatformKernel", Utility::GetPlatformKernel());

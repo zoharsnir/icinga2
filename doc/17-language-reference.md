@@ -400,7 +400,7 @@ BuildCompilerVersion|**Read-only.** The version of the compiler Icinga was built
 BuildHostName       |**Read-only.** The name of the host Icinga was built on, e.g. `acheron`.
 ApplicationVersion  |**Read-only.** The application version, e.g. `2.9.0`.
 MaxConcurrentChecks |**Read-write**. The number of max checks run simultaneously. Defaults to `512`.
-Environment         |**Read-write**. The name of the Icinga environment. Included in the SNI host name when making outbound connections. Defaults to `production`.
+ApiEnvironment      |**Read-write**. The name of the Icinga environment for ApiListener. Included in the SNI host name when making outbound connections. Defaults to `production`.
 
 Certain variables are used to define file paths, you should never need to change them, as they are built based on
 constants above.
@@ -421,7 +421,6 @@ PrefixDir           |**Read-only.** Contains the installation prefix that was sp
 SysconfDir          |**Read-only.** Contains the path of the sysconf directory. Defaults to `PrefixDir + "/etc"`.
 LocalStateDir       |**Read-only.** Contains the path of the local state directory. Defaults to `PrefixDir + "/var"`.
 RunDir              |**Read-only.** Contains the path of the run directory. Defaults to `LocalStateDir + "/run"`.
-
 
 Advanced runtime constants. Please only use them if advised by support or developers.
 
