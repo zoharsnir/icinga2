@@ -22,6 +22,7 @@
 
 #include "base/i2-base.hpp"
 #include "base/object.hpp"
+#include "base/dictionary.hpp"
 #include <boost/thread/mutex.hpp>
 
 namespace icinga
@@ -45,7 +46,9 @@ public:
 
 	void Close();
 
+	Dictionary::Ptr GetClientAddressDetails();
 	String GetClientAddress();
+	Dictionary::Ptr GetPeerAddressDetails();
 	String GetPeerAddress();
 
 	size_t Read(void *buffer, size_t size);
@@ -70,7 +73,8 @@ protected:
 private:
 	SOCKET m_FD{INVALID_SOCKET}; /**< The socket descriptor. */
 
-	static String GetAddressFromSockaddr(sockaddr *address, socklen_t len);
+	static Dictionary::Ptr GetDetailsFromSockaddr(sockaddr *address, socklen_t len);
+	static String GetHumanReadableAddress(const Dictionary::Ptr& socketDetails);
 };
 
 class socket_error : virtual public std::exception, virtual public boost::exception { };
