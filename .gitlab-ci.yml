@@ -15,8 +15,7 @@ build-icinga2:
   script: >
     cd build
     && cmake -DCMAKE_INSTALL_PREFIX=/opt/icinga2 -DICINGA2_PLUGINDIR=/usr/lib64/nagios/plugins
-    -DICINGA2_USER=nagios -DICINGA2_GROUP=nagios -DICINGA2_COMMAND_GROUP=nagios
-    -DBOOST_INCLUDEDIR=/usr/include/boost148 -DBOOST_LIBRARYDIR=/usr/lib64/boost148 ..
+    -DICINGA2_USER=nagios -DICINGA2_GROUP=nagios -DICINGA2_COMMAND_GROUP=nagios ..
     && make
     && make test
     && ln -s $(pwd)/../destdir /opt/icinga2

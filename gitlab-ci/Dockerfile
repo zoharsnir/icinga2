@@ -1,6 +1,6 @@
 FROM centos:7
 RUN yum install -y epel-release
-RUN yum install -y bash boost148-program-options boost148-regex boost148-system boost148-thread coreutils glibc libedit libgcc libstdc++ ncurses-libs openssl-libs shadow-utils yajl
+RUN yum install -y bash boost-{program-options,regex,system,thread} coreutils glibc libedit libgcc libstdc++ ncurses-libs openssl-libs shadow-utils yajl
 RUN yum install -y fortune-mod mailx nagios-plugins-all supervisor which
 COPY destdir /opt/icinga2
 COPY gitlab-ci/mk_i2config.sh /mk_i2config.sh
