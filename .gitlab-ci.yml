@@ -20,7 +20,6 @@ build-icinga2:
     && make test
     && ln -s $(pwd)/../destdir /opt/icinga2
     && make install
-    && rm -rf /opt/icinga2/var/{cache,log,run}/icinga2
     && cat ../gitlab-ci/icinga2/redis.conf >/opt/icinga2/etc/icinga2/features-available/redis.conf
     && cd ..
   artifacts:
