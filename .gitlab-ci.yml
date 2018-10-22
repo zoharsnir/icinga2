@@ -46,7 +46,7 @@ build-image:
 
 deploy-image-1: &deploy-image-base
   variables:
-    SSH_ADDR: 194.0.135.12
+    SSH_ADDR: 10.77.27.18
     ICINGA2_HOSTS: 1000
   stage: deploy-image
   dependencies:
@@ -73,5 +73,5 @@ deploy-image-1: &deploy-image-base
 deploy-image-2:
   <<: *deploy-image-base
   variables:
-    SSH_ADDR: 194.0.135.40
+    SSH_ADDR: 10.77.27.16
     ICINGA2_HOSTS: 100000
