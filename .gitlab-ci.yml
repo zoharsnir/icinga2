@@ -14,7 +14,7 @@ build-icinga2:
       - build/
   script: >
     cd build
-    && cmake -DCMAKE_INSTALL_PREFIX=/opt/icinga2 -DICINGA2_PLUGINDIR=/usr/lib64/nagios/plugins
+    && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/opt/icinga2 -DICINGA2_PLUGINDIR=/usr/lib64/nagios/plugins
     -DICINGA2_USER=nagios -DICINGA2_GROUP=nagios -DICINGA2_COMMAND_GROUP=nagios ..
     && make
     && make test
