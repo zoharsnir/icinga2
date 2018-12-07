@@ -53,22 +53,6 @@ enum CheckableType
 	CheckableService
 };
 
-/**
- * Severity Flags
- *
- * @ingroup icinga
- */
-enum SeverityFlag
-{
-	SeverityFlagDowntime = 1,
-	SeverityFlagAcknowledgement = 2,
-	SeverityFlagUnhandled = 8,
-	SeverityFlagPending = 16,
-	SeverityFlagWarning = 32,
-	SeverityFlagUnknown = 64,
-	SeverityFlagCritical = 128,
-};
-
 class CheckCommand;
 class EventCommand;
 class Dependency;
