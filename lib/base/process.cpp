@@ -358,8 +358,34 @@ static BOOL CreatePipeOverlapped(HANDLE *outReadPipe, HANDLE *outWritePipe,
 	return TRUE;
 }
 
+class Bench
+{
+public:
+	inline
+	Bench(String subject) : Subject(std::move(subject)), Start(Utility::GetTime())
+	{
+	}
+
+	Bench(const Bench&) = delete;
+	Bench(Bench&&) = delete;
+	Bench& operator=(const Bench&) = delete;
+	Bench& operator=(Bench&&) = delete;
+
+	inline
+	~Bench()
+	{
+		auto end (Utility::GetTime());
+		Log(LogCritical, "ShowTimeBitch") << Subject << " took " << (end - Start) << "s";
+	}
+
+	String Subject;
+	double Start;
+};
+
 void Process::Run(Process::Callback callback)
 {
+	Bench pr ("Process#Run()");
+
 	boost::call_once(l_ProcessOnceFlag, &Process::ThreadInitialize);
 
 	m_Result.ExecutionStart = Utility::GetTime();
