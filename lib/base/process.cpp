@@ -574,6 +574,30 @@ void Process::SetTimeout(double timeout)
 	m_Timeout = timeout;
 }
 
+class Bench
+{
+public:
+	inline
+	Bench(String subject) : Subject(std::move(subject)), Start(Utility::GetTime())
+	{
+	}
+
+	Bench(const Bench&) = delete;
+	Bench(Bench&&) = delete;
+	Bench& operator=(const Bench&) = delete;
+	Bench& operator=(Bench&&) = delete;
+
+	inline
+	~Bench()
+	{
+		auto end (Utility::GetTime());
+		Log(LogCritical, "ShowTimeBitch") << Subject << " took " << (end - Start) << "s";
+	}
+
+	String Subject;
+	double Start;
+};
+
 double Process::GetTimeout() const
 {
 	return m_Timeout;
@@ -779,6 +803,8 @@ static BOOL CreatePipeOverlapped(HANDLE *outReadPipe, HANDLE *outWritePipe,
 
 void Process::Run(const std::function<void(const ProcessResult&)>& callback)
 {
+	Bench pr ("Process#Run()");
+
 #ifndef _WIN32
 	boost::call_once(l_SpawnHelperOnceFlag, &Process::InitializeSpawnHelper);
 #endif /* _WIN32 */
