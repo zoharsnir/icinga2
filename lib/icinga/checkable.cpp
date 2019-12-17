@@ -24,6 +24,7 @@
 #include "base/objectlock.hpp"
 #include "base/utility.hpp"
 #include "base/exception.hpp"
+#include <cmath>
 
 using namespace icinga;
 
@@ -74,9 +75,9 @@ void Checkable::Start(bool runtimeCreated)
 	double now = Utility::GetTime();
 
 	if (GetNextCheck() < now + 60) {
-		double delta = std::min(GetCheckInterval(), 60.0);
+		double delta = std::min(GetCheckInterval() * GetIntervalShuffleFactor(), 60.0);
 		delta *= (double)std::rand() / RAND_MAX;
-		SetNextCheck(now + delta);
+		SetNextCheck(now + delta + GetCheckInterval() * fabs(GetIntervalShuffleFactor() - 1));
 	}
 
 	ObjectImpl<Checkable>::Start(runtimeCreated);

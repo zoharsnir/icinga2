@@ -195,6 +195,8 @@ public:
 	void ValidateRetryInterval(const Lazy<double>& lvalue, const ValidationUtils& value) final;
 	void ValidateMaxCheckAttempts(const Lazy<int>& lvalue, const ValidationUtils& value) final;
 
+	double GetIntervalShuffleFactor();
+
 	static void IncreasePendingChecks();
 	static void DecreasePendingChecks();
 	static int GetPendingChecks();

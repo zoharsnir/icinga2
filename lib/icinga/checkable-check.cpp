@@ -31,6 +31,7 @@
 #include "base/convert.hpp"
 #include "base/utility.hpp"
 #include "base/context.hpp"
+#include <cstdlib>
 
 using namespace icinga;
 
@@ -82,7 +83,7 @@ void Checkable::UpdateNextCheck(const MessageOrigin::Ptr& origin)
 	if (adj != 0.0)
 		adj = std::min(0.5 + fmod(GetSchedulingOffset(), interval * 5) / 100.0, adj);
 
-	double nextCheck = now - adj + interval;
+	double nextCheck = now - adj + interval * GetIntervalShuffleFactor();
 	double lastCheck = GetLastCheck();
 
 	Log(LogDebug, "Checkable")
@@ -290,7 +291,7 @@ void Checkable::ProcessCheckResult(const CheckResult::Ptr& cr, const MessageOrig
 			if (!parent->GetEnableActiveChecks())
 				continue;
 
-			if (parent->GetNextCheck() >= now + parent->GetRetryInterval()) {
+			if (parent->GetNextCheck() >= now + parent->GetRetryInterval() * parent->GetIntervalShuffleFactor()) {
 				ObjectLock olock(parent);
 				parent->SetNextCheck(now);
 			}
@@ -377,7 +378,7 @@ void Checkable::ProcessCheckResult(const CheckResult::Ptr& cr, const MessageOrig
 		if (ttl > 0)
 			offset = ttl;
 		else
-			offset = GetCheckInterval();
+			offset = GetCheckInterval() * GetIntervalShuffleFactor();
 
 		SetNextCheck(Utility::GetTime() + offset, false, origin);
 	}
@@ -607,4 +608,16 @@ void Checkable::AquirePendingCheckSlot(int maxPendingChecks)
 		m_PendingChecksCV.wait(lock);
 
 	m_PendingChecks++;
+}
+
+/**
+ * Returns a random factor derived from scheduler_shuffle_cap to multiply the check interval with.
+ *
+ * E.g. if scheduler_shuffle_cap is 20 (%), this function returns [0.8, 1.2].
+ */
+double Checkable::GetIntervalShuffleFactor()
+{
+	return (GetSchedulerShuffleCap() / 100) // scheduler_shuffle_cap as non-%, i.e. 10 => 0.1
+		* (rand() / (double)RAND_MAX * 2 - 1) // random number [-1, 1]
+		+ 1;
 }
