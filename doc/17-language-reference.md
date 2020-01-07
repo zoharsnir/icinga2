@@ -1022,6 +1022,14 @@ function MakeHelloFunction(name) {
 }
 ```
 
+The `use` keyword also supports `this`, i.e.:
+
+```
+(function() use (this = [ "foo", "bar" ]) {
+  log(this)
+})()
+```
+
 ## Conditional Statements <a id="conditional-statements"></a>
 
 ### Conditional Statements: if/else <a id="conditional-statements-if-else"></a>
