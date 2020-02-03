@@ -14,6 +14,7 @@ INITIALIZE_ONCE(&ApiEvents::StaticInitialize);
 
 void ApiEvents::StaticInitialize()
 {
+	/*
 	Checkable::OnNewCheckResult.connect(&ApiEvents::CheckResultHandler);
 	Checkable::OnStateChange.connect(&ApiEvents::StateChangeHandler);
 	Checkable::OnNotificationSentToAllUsers.connect(&ApiEvents::NotificationSentToAllUsersHandler);
@@ -30,6 +31,7 @@ void ApiEvents::StaticInitialize()
 	Downtime::OnDowntimeRemoved.connect(&ApiEvents::DowntimeRemovedHandler);
 	Downtime::OnDowntimeStarted.connect(&ApiEvents::DowntimeStartedHandler);
 	Downtime::OnDowntimeTriggered.connect(&ApiEvents::DowntimeTriggeredHandler);
+	*/
 }
 
 void ApiEvents::CheckResultHandler(const Checkable::Ptr& checkable, const CheckResult::Ptr& cr, const MessageOrigin::Ptr& origin)
