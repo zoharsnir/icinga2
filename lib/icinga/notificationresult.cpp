@@ -2,6 +2,7 @@
 
 #include "icinga/notificationresult.hpp"
 #include "icinga/notificationresult-ti.cpp"
+#include "base/scriptglobal.hpp"
 
 using namespace icinga;
 
