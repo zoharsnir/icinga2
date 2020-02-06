@@ -40,6 +40,12 @@ void ApiEvents::CheckResultHandler(const Checkable::Ptr& checkable, const CheckR
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "CheckResultHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'CheckResult'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -49,6 +55,12 @@ void ApiEvents::CheckResultHandler(const Checkable::Ptr& checkable, const CheckR
 	Host::Ptr host;
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
+
+	Log(LogCritical, "CheckResultHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
 
 	result->Set("host", host->GetName());
 	if (service)
@@ -71,6 +83,12 @@ void ApiEvents::StateChangeHandler(const Checkable::Ptr& checkable, const CheckR
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "StateChangeHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'StateChange'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -80,6 +98,12 @@ void ApiEvents::StateChangeHandler(const Checkable::Ptr& checkable, const CheckR
 	Host::Ptr host;
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
+
+	Log(LogCritical, "StateChangeHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
 
 	result->Set("host", host->GetName());
 	if (service)
@@ -106,6 +130,12 @@ void ApiEvents::NotificationSentToAllUsersHandler(const Notification::Ptr& notif
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "NotificationSentToAllUsersHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'Notification'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -116,11 +146,22 @@ void ApiEvents::NotificationSentToAllUsersHandler(const Notification::Ptr& notif
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
 
+	Log(LogCritical, "NotificationSentToAllUsersHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
+
 	result->Set("host", host->GetName());
 	if (service)
 		result->Set("service", service->GetShortName());
 
 	NotificationCommand::Ptr command = notification->GetCommand();
+
+	Log(LogCritical, "NotificationSentToAllUsersHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; cr.get() = " << (void*)cr.get()
+		<< "; command.get() = " << (void*)command.get();
 
 	if (command)
 		result->Set("command", command->GetName());
@@ -152,6 +193,11 @@ void ApiEvents::FlappingChangedHandler(const Checkable::Ptr& checkable, const Me
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "FlappingChangedHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'Flapping'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -161,6 +207,11 @@ void ApiEvents::FlappingChangedHandler(const Checkable::Ptr& checkable, const Me
 	Host::Ptr host;
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
+
+	Log(LogCritical, "FlappingChangedHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
 
 	result->Set("host", host->GetName());
 	if (service)
@@ -190,6 +241,11 @@ void ApiEvents::AcknowledgementSetHandler(const Checkable::Ptr& checkable,
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "AcknowledgementSetHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'AcknowledgementSet'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -199,6 +255,11 @@ void ApiEvents::AcknowledgementSetHandler(const Checkable::Ptr& checkable,
 	Host::Ptr host;
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
+
+	Log(LogCritical, "AcknowledgementSetHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
 
 	result->Set("host", host->GetName());
 	if (service)
@@ -229,6 +290,11 @@ void ApiEvents::AcknowledgementClearedHandler(const Checkable::Ptr& checkable, c
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "AcknowledgementClearedHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'AcknowledgementCleared'.");
 
 	Dictionary::Ptr result = new Dictionary();
@@ -238,6 +304,11 @@ void ApiEvents::AcknowledgementClearedHandler(const Checkable::Ptr& checkable, c
 	Host::Ptr host;
 	Service::Ptr service;
 	tie(host, service) = GetHostService(checkable);
+
+	Log(LogCritical, "AcknowledgementClearedHandler")
+		<< "checkable.get() = " << (void*)checkable.get()
+		<< "; host.get() = " << (void*)host.get()
+		<< "; service.get() = " << (void*)service.get();
 
 	result->Set("host", host->GetName());
 	if (service)
@@ -263,6 +334,11 @@ void ApiEvents::CommentAddedHandler(const Comment::Ptr& comment)
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "CommentAddedHandler")
+		<< "comment.get() = " << (void*)comment.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'CommentAdded'.");
 
 	Dictionary::Ptr result = new Dictionary({
@@ -285,6 +361,11 @@ void ApiEvents::CommentRemovedHandler(const Comment::Ptr& comment)
 
 	if (queues.empty() && !inboxes)
 		return;
+
+	Log(LogCritical, "CommentRemovedHandler")
+		<< "comment.get() = " << (void*)comment.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
 
 	Log(LogDebug, "ApiEvents", "Processing event type 'CommentRemoved'.");
 
@@ -309,6 +390,11 @@ void ApiEvents::DowntimeAddedHandler(const Downtime::Ptr& downtime)
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "DowntimeAddedHandler")
+		<< "downtime.get() = " << (void*)downtime.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'DowntimeAdded'.");
 
 	Dictionary::Ptr result = new Dictionary({
@@ -331,6 +417,11 @@ void ApiEvents::DowntimeRemovedHandler(const Downtime::Ptr& downtime)
 
 	if (queues.empty() && !inboxes)
 		return;
+
+	Log(LogCritical, "DowntimeRemovedHandler")
+		<< "downtime.get() = " << (void*)downtime.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
 
 	Log(LogDebug, "ApiEvents", "Processing event type 'DowntimeRemoved'.");
 
@@ -355,6 +446,11 @@ void ApiEvents::DowntimeStartedHandler(const Downtime::Ptr& downtime)
 	if (queues.empty() && !inboxes)
 		return;
 
+	Log(LogCritical, "DowntimeStartedHandler")
+		<< "downtime.get() = " << (void*)downtime.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
+
 	Log(LogDebug, "ApiEvents", "Processing event type 'DowntimeStarted'.");
 
 	Dictionary::Ptr result = new Dictionary({
@@ -377,6 +473,11 @@ void ApiEvents::DowntimeTriggeredHandler(const Downtime::Ptr& downtime)
 
 	if (queues.empty() && !inboxes)
 		return;
+
+	Log(LogCritical, "DowntimeTriggeredHandler")
+		<< "downtime.get() = " << (void*)downtime.get()
+		<< "; queues.empty() = " << (unsigned short)queues.empty()
+		<< "; !inboxes = " << (unsigned short)!inboxes;
 
 	Log(LogDebug, "ApiEvents", "Processing event type 'DowntimeTriggered'.");
 
