@@ -12,7 +12,7 @@ String Configuration::ApiBindHost;
 String Configuration::ApiBindPort{"5665"};
 bool Configuration::AttachDebugger{false};
 String Configuration::CacheDir;
-int Configuration::Concurrency{static_cast<int>(std::thread::hardware_concurrency())};
+int Configuration::Concurrency{static_cast<int>(1)};
 String Configuration::ConfigDir;
 String Configuration::DataDir;
 String Configuration::EventEngine;

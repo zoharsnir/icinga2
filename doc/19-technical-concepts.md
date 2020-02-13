@@ -1220,7 +1220,7 @@ are performed in the default `IoBoundWorkSlot` pool inside the I/O engine.
 The I/O engine has another pool available: `CpuBoundWork`.
 
 This is used for processing CPU intensive tasks, such as handling a HTTP request.
-Depending on the available CPU cores, this is limited to `std::thread::hardware_concurrency() * 3u / 2u`.
+Depending on the available CPU cores, this is limited to `1 * 3u / 2u`.
 
 ```
 1 core * 3 / 2 = 1

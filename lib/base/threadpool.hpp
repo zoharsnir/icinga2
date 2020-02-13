@@ -36,7 +36,7 @@ class ThreadPool
 public:
 	typedef std::function<void ()> WorkFunction;
 
-	ThreadPool(size_t threads = std::thread::hardware_concurrency() * 2u);
+	ThreadPool(size_t threads = 1 * 2u);
 	~ThreadPool();
 
 	void Start();
