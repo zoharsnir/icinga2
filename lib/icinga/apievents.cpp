@@ -23,6 +23,7 @@ void ApiEvents::StaticInitialize()
 
 	Checkable::OnAcknowledgementSet.connect(&ApiEvents::AcknowledgementSetHandler);
 	Checkable::OnAcknowledgementCleared.connect(&ApiEvents::AcknowledgementClearedHandler);
+	*/
 
 	Comment::OnCommentAdded.connect(&ApiEvents::CommentAddedHandler);
 	Comment::OnCommentRemoved.connect(&ApiEvents::CommentRemovedHandler);
@@ -31,7 +32,6 @@ void ApiEvents::StaticInitialize()
 	Downtime::OnDowntimeRemoved.connect(&ApiEvents::DowntimeRemovedHandler);
 	Downtime::OnDowntimeStarted.connect(&ApiEvents::DowntimeStartedHandler);
 	Downtime::OnDowntimeTriggered.connect(&ApiEvents::DowntimeTriggeredHandler);
-	*/
 }
 
 void ApiEvents::CheckResultHandler(const Checkable::Ptr& checkable, const CheckResult::Ptr& cr, const MessageOrigin::Ptr& origin)
