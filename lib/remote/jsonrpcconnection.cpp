@@ -210,9 +210,13 @@ void JsonRpcConnection::Disconnect()
 				}
 			}
 
+			Log(LogWarning, "JsonRpcConnection") << 10;
+
 			m_OutgoingMessagesQueued.Set();
 
 			m_WriterDone.Wait(yc);
+
+			Log(LogWarning, "JsonRpcConnection") << 20;
 
 			/*
 			 * Do not swallow exceptions in a coroutine.
@@ -229,9 +233,15 @@ void JsonRpcConnection::Disconnect()
 
 			m_Stream->lowest_layer().cancel(ec);
 
+			Log(LogWarning, "JsonRpcConnection") << 30;
+
 			m_Stream->next_layer().async_shutdown(yc[ec]);
 
+			Log(LogWarning, "JsonRpcConnection") << 40;
+
 			m_Stream->lowest_layer().shutdown(m_Stream->lowest_layer().shutdown_both, ec);
+
+			Log(LogWarning, "JsonRpcConnection") << 50;
 		}
 	});
 }
