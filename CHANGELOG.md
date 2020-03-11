@@ -7,6 +7,90 @@ documentation before upgrading to a new release.
 
 Released closed milestones can be found on [GitHub](https://github.com/Icinga/icinga2/milestones?state=closed).
 
+## 2.12.0 (2020-03-1)
+
+- Icinga DB
+- JSON-RPC
+
+### Breaking changes
+
+* Refuse acking an already acked checkable #7695 https://github.com/Icinga/icinga2/pull/7695/files
+* Config lexer: complain on EOF in heredocs, i.e. {{{abc<EOF> #7541 https://github.com/Icinga/icinga2/pull/7541
+
+### Enhancements
+
+* Icinga DB
+* API
+  * Checkable#acknowledgement_last_change #7881 https://github.com/Icinga/icinga2/pull/7881
+  * Improve error message for POST queries #7681 https://github.com/Icinga/icinga2/pull/7681/files
+  * /v1/actions/remove-comment: let users specify themselves #7646 https://github.com/Icinga/icinga2/pull/7646
+  * /v1/actions/remove-downtime: let users specify themselves #7645 https://github.com/Icinga/icinga2/pull/7645
+  * API /v1/config/stages 'activate' parameter https://github.com/Icinga/icinga2/pull/7535
+  * Introduce Checkable#next_update https://github.com/Icinga/icinga2/pull/7534
+* CLI
+  * CLI: Add `pki verify` command for better TLS certificate troubleshooting #7843 https://github.com/Icinga/icinga2/pull/7843
+  * Improve experience with 'Node Setup for Agents/Satellite' #7835 https://github.com/Icinga/icinga2/pull/7835
+  * CLI: Add OpenSSL version to 'Build' section in --version #7833 https://github.com/Icinga/icinga2/pull/7833
+* DSL
+  * DSL: Add get_template{,s} https://github.com/Icinga/icinga2/pull/7632
+  * MacroProcessor::ResolveArguments(): skip null argument values https://github.com/Icinga/icinga2/pull/7567
+  * Dependency#OnAllConfigLoaded(): don't link *this with the child if *this is going to be dropped https://github.com/Icinga/icinga2/pull/7538
+  * DSL: introduce x?y:z https://github.com/Icinga/icinga2/pull/7442
+  * LegacyTimePeriod: support specifying seconds https://github.com/Icinga/icinga2/pull/7439
+  * DSL: Add support for Lambda Closures ()use(x)=>x and ()use(x)=>{return x} https://github.com/Icinga/icinga2/pull/7417
+* ITL
+  * ITL: Add notemp parameter to oracle health #7748 https://github.com/Icinga/icinga2/pull/7748
+  * Add extended checks options to snmp-interface command template https://github.com/Icinga/icinga2/pull/7602
+  * Add file age check for Windows command definition https://github.com/Icinga/icinga2/pull/7540
+* Docs
+  * Dev Docs: Update debugging instructions #7867 https://github.com/Icinga/icinga2/pull/7867
+  * Add new Projects to documentation #7859 https://github.com/Icinga/icinga2/pull/7859/files
+  * Docs: clarify CRITICAL vs. UNKNOWN #7665 https://github.com/Icinga/icinga2/pull/7665
+  * Docs: explicitly explain how to disable freshness checks #7664 https://github.com/Icinga/icinga2/pull/7664
+  * Docs: Update installation for RHEL/CentOS 8 and SLES 15 #7640 https://github.com/Icinga/icinga2/pull/7640/files
+  * Powershell example to validate the certificate https://github.com/Icinga/icinga2/pull/7603
+* Misc
+  * Don't send event::Heartbeat to unauthenticated peers #7747 https://github.com/Icinga/icinga2/pull/7747
+  * OpenTsdbWriter - Custom Tag Support #7357 https://github.com/Icinga/icinga2/pull/7357
+
+### Bugfixes
+
+* Core
+  * JSON-RPC
+  * Code quality fixes
+  * cope with OS which don't fill in si_pid in siginfo #7739 https://github.com/Icinga/icinga2/pull/7739
+  * Revert NotificationResult #7737 https://github.com/Icinga/icinga2/pull/7737
+  * Checkable#GetProblem(): consider PENDING not a problem #7685 https://github.com/Icinga/icinga2/pull/7685
+  * Main(): don't call Process::InitializeSpawnHelper() https://github.com/Icinga/icinga2/pull/7606
+* Cluster
+  * Fix 'check_timeout' not being forwarded to agent command endpoints #7861 https://github.com/Icinga/icinga2/pull/7861
+  * Cluster config sync: Use a more friendly message when configs are equal and don't need a reload #7811 https://github.com/Icinga/icinga2/pull/7811
+  * Fix open connections when agent waits for CA approval #7686 https://github.com/Icinga/icinga2/pull/7686
+  * Fix TLS context not being updated on signed certificate messages on agents #7654 https://github.com/Icinga/icinga2/pull/7654
+* API
+  * Close connections w/o sucessful TLS handshakes during 10s #7809 https://github.com/Icinga/icinga2/pull/7809
+  * API: Handle permission exceptions soon enough, returning 404 https://github.com/Icinga/icinga2/pull/7528
+* SELinux
+  * SELinux: Let safe-reload run in icinga2_t #7858 https://github.com/Icinga/icinga2/pull/7858
+  * SELinux: Allow direct smtp notifications #7749 https://github.com/Icinga/icinga2/pull/7749
+* Windows
+  * Terminate windows check processes with UNKNOWN state on timeout #7788 https://github.com/Icinga/icinga2/pull/7788
+  * Ensure that log replay files are properly renamed on Windows #7767 https://github.com/Icinga/icinga2/pull/7767
+* Metrics
+  * Graphite/OpenTSDB: Ensure that Reconnect failure is detected #7765 https://github.com/Icinga/icinga2/pull/7765 
+  * Metrics: Always send '0' as value for thresholds #7696 https://github.com/Icinga/icinga2/pull/7696/files
+* Scripts
+  * Fix notification scripts to stay compatible with Dash #7706 https://github.com/Icinga/icinga2/pull/7706
+  * Fix bash line continuation in mail-host-notification.sh #7701 https://github.com/Icinga/icinga2/pull/7701/files
+  * Fix notification scripts string comparison #7647 https://github.com/Icinga/icinga2/pull/7647/files
+  * service and host mail-notifications, add line-breaks to very long output https://github.com/Icinga/icinga2/pull/6822
+  * Set correct utf-8 email subject header (RFC1342) https://github.com/Icinga/icinga2/pull/6369
+* Misc
+  * Catch exception when trusted cert is not readable during node setup on agent/satellite #7838 https://github.com/Icinga/icinga2/pull/7838 
+  * DaemonUtility#ValidateConfigFiles(): re-try unknown zones once they may have become known https://github.com/Icinga/icinga2/pull/7546
+  * CheckCommand ssl: s/-N/--sni/ #7741 https://github.com/Icinga/icinga2/pull/7741/files
+  * Small doc fixes
+
 ## 2.11.3 (2020-03-02)
 
 The 2.11.3 release fixes a critical crash in our JSON-RPC connections. This mainly affects large HA
