@@ -7,51 +7,51 @@ documentation before upgrading to a new release.
 
 Released closed milestones can be found on [GitHub](https://github.com/Icinga/icinga2/milestones?state=closed).
 
-## 2.12.0 (2020-03-1)
+## 2.12.0 RC1 (SET MY DATE!!!!!!!!!!)
 
 - Icinga DB
 - JSON-RPC
 
 ### Breaking changes
 
-* Refuse acking an already acked checkable #7695 https://github.com/Icinga/icinga2/pull/7695/files
-* Config lexer: complain on EOF in heredocs, i.e. {{{abc<EOF> #7541 https://github.com/Icinga/icinga2/pull/7541
+* Refuse acknowledging an already acknowledged checkable #7695
+* Config lexer: complain on EOF in heredocs, i.e. `{{{abc<EOF>` #7541
 
 ### Enhancements
 
-* Icinga DB
+* Core
+  * Implement new database backend: Icinga DB #7571
 * API
-  * Checkable#acknowledgement_last_change #7881 https://github.com/Icinga/icinga2/pull/7881
-  * Improve error message for POST queries #7681 https://github.com/Icinga/icinga2/pull/7681/files
-  * /v1/actions/remove-comment: let users specify themselves #7646 https://github.com/Icinga/icinga2/pull/7646
-  * /v1/actions/remove-downtime: let users specify themselves #7645 https://github.com/Icinga/icinga2/pull/7645
-  * API /v1/config/stages 'activate' parameter https://github.com/Icinga/icinga2/pull/7535
-  * Introduce Checkable#next_update https://github.com/Icinga/icinga2/pull/7534
+  * Host/Service: Add `acknowledgement_last_change` and `next_update` attributes #7881 #7534
+  * Improve error message for POST queries #7681
+  * /v1/actions/remove-comment: let users specify themselves #7646
+  * /v1/actions/remove-downtime: let users specify themselves #7645
+  * /v1/config/stages: Add 'activate' parameter #7535
 * CLI
-  * CLI: Add `pki verify` command for better TLS certificate troubleshooting #7843 https://github.com/Icinga/icinga2/pull/7843
-  * Improve experience with 'Node Setup for Agents/Satellite' #7835 https://github.com/Icinga/icinga2/pull/7835
-  * CLI: Add OpenSSL version to 'Build' section in --version #7833 https://github.com/Icinga/icinga2/pull/7833
+  * Add `pki verify` command for better TLS certificate troubleshooting #7843
+  * Add OpenSSL version to 'Build' section in --version #7833
+  * Improve experience with 'Node Setup for Agents/Satellite' #7835
 * DSL
-  * DSL: Add get_template{,s} https://github.com/Icinga/icinga2/pull/7632
-  * MacroProcessor::ResolveArguments(): skip null argument values https://github.com/Icinga/icinga2/pull/7567
-  * Dependency#OnAllConfigLoaded(): don't link *this with the child if *this is going to be dropped https://github.com/Icinga/icinga2/pull/7538
-  * DSL: introduce x?y:z https://github.com/Icinga/icinga2/pull/7442
-  * LegacyTimePeriod: support specifying seconds https://github.com/Icinga/icinga2/pull/7439
-  * DSL: Add support for Lambda Closures ()use(x)=>x and ()use(x)=>{return x} https://github.com/Icinga/icinga2/pull/7417
+  * Add `get_template()` and `get_templates()` #7632
+  * `MacroProcessor::ResolveArguments()`: skip null argument values #7567
+  * Fix crash due to dependency apply rule with `ignore_on_error` and non-existing parent #7538
+  * Introduce ternary operator (`x ? y : z`) #7442
+  * LegacyTimePeriod: support specifying seconds #7439
+  * Add support for Lambda Closures (`() use(x) => x and () use(x) => { return x }`) #7417
 * ITL
-  * ITL: Add notemp parameter to oracle health #7748 https://github.com/Icinga/icinga2/pull/7748
-  * Add extended checks options to snmp-interface command template https://github.com/Icinga/icinga2/pull/7602
-  * Add file age check for Windows command definition https://github.com/Icinga/icinga2/pull/7540
+  * Add notemp parameter to oracle health #7748
+  * Add extended checks options to snmp-interface command template #7602
+  * Add file age check for Windows command definition #7540
 * Docs
-  * Dev Docs: Update debugging instructions #7867 https://github.com/Icinga/icinga2/pull/7867
-  * Add new Projects to documentation #7859 https://github.com/Icinga/icinga2/pull/7859/files
-  * Docs: clarify CRITICAL vs. UNKNOWN #7665 https://github.com/Icinga/icinga2/pull/7665
-  * Docs: explicitly explain how to disable freshness checks #7664 https://github.com/Icinga/icinga2/pull/7664
-  * Docs: Update installation for RHEL/CentOS 8 and SLES 15 #7640 https://github.com/Icinga/icinga2/pull/7640/files
-  * Powershell example to validate the certificate https://github.com/Icinga/icinga2/pull/7603
+  * Development: Update debugging instructions #7867
+  * Add new API clients #7859
+  * Clarify CRITICAL vs. UNKNOWN #7665
+  * Explicitly explain how to disable freshness checks #7664
+  * Update installation for RHEL/CentOS 8 and SLES 15 #7640
+  * Add Powershell example to validate the certificate #7603
 * Misc
-  * Don't send event::Heartbeat to unauthenticated peers #7747 https://github.com/Icinga/icinga2/pull/7747
-  * OpenTsdbWriter - Custom Tag Support #7357 https://github.com/Icinga/icinga2/pull/7357
+  * Don't send `event::Heartbeat` to unauthenticated peers #7747
+  * OpenTsdbWriter: Add custom tag support #7357
 
 ### Bugfixes
 
