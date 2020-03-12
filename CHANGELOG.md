@@ -56,40 +56,39 @@ Released closed milestones can be found on [GitHub](https://github.com/Icinga/ic
 ### Bugfixes
 
 * Core
-  * JSON-RPC
-  * Code quality fixes
-  * cope with OS which don't fill in si_pid in siginfo #7739 https://github.com/Icinga/icinga2/pull/7739
-  * Revert NotificationResult #7737 https://github.com/Icinga/icinga2/pull/7737
-  * Checkable#GetProblem(): consider PENDING not a problem #7685 https://github.com/Icinga/icinga2/pull/7685
-  * Main(): don't call Process::InitializeSpawnHelper() https://github.com/Icinga/icinga2/pull/7606
+  * Fix JSON-RPC crashes #7532 #7737
+  * Fix zone definitions in zones #7546
+  * Fix deadlock during start on OpenBSD #7739
+  * Consider PENDING not a problem #7685
+  * Fix zombie processes after reload #7606
 * Cluster
-  * Fix 'check_timeout' not being forwarded to agent command endpoints #7861 https://github.com/Icinga/icinga2/pull/7861
-  * Cluster config sync: Use a more friendly message when configs are equal and don't need a reload #7811 https://github.com/Icinga/icinga2/pull/7811
-  * Fix open connections when agent waits for CA approval #7686 https://github.com/Icinga/icinga2/pull/7686
-  * Fix TLS context not being updated on signed certificate messages on agents #7654 https://github.com/Icinga/icinga2/pull/7654
+  * Fix `check_timeout` not being forwarded to agent command endpoints #7861
+  * Config sync: Use a more friendly message when configs are equal and don't need a reload #7811
+  * Fix open connections when agent waits for CA approval #7686
+  * Fix TLS context not being updated on signed certificate messages on agents #7654
 * API
-  * Close connections w/o sucessful TLS handshakes during 10s #7809 https://github.com/Icinga/icinga2/pull/7809
-  * API: Handle permission exceptions soon enough, returning 404 https://github.com/Icinga/icinga2/pull/7528
+  * Close connections w/o successful TLS handshakes after 10s #7809
+  * Handle permission exceptions soon enough, returning 404 #7528
 * SELinux
-  * SELinux: Let safe-reload run in icinga2_t #7858 https://github.com/Icinga/icinga2/pull/7858
-  * SELinux: Allow direct smtp notifications #7749 https://github.com/Icinga/icinga2/pull/7749
+  * Fix safe-reload #7858
+  * Allow direct SMTP notifications #7749
 * Windows
-  * Terminate windows check processes with UNKNOWN state on timeout #7788 https://github.com/Icinga/icinga2/pull/7788
-  * Ensure that log replay files are properly renamed on Windows #7767 https://github.com/Icinga/icinga2/pull/7767
+  * Terminate check processes with UNKNOWN state on timeout #7788
+  * Ensure that log replay files are properly renamed #7767
 * Metrics
-  * Graphite/OpenTSDB: Ensure that Reconnect failure is detected #7765 https://github.com/Icinga/icinga2/pull/7765 
-  * Metrics: Always send '0' as value for thresholds #7696 https://github.com/Icinga/icinga2/pull/7696/files
+  * Graphite/OpenTSDB: Ensure that reconnect failure is detected #7765
+  * Always send 0 as value for thresholds #7696
 * Scripts
-  * Fix notification scripts to stay compatible with Dash #7706 https://github.com/Icinga/icinga2/pull/7706
-  * Fix bash line continuation in mail-host-notification.sh #7701 https://github.com/Icinga/icinga2/pull/7701/files
-  * Fix notification scripts string comparison #7647 https://github.com/Icinga/icinga2/pull/7647/files
-  * service and host mail-notifications, add line-breaks to very long output https://github.com/Icinga/icinga2/pull/6822
-  * Set correct utf-8 email subject header (RFC1342) https://github.com/Icinga/icinga2/pull/6369
+  * Fix notification scripts to stay compatible with Dash #7706
+  * Fix bash line continuation in mail-host-notification.sh #7701
+  * Fix notification scripts string comparison #7647
+  * Service and host mail-notifications: Add line-breaks to very long output #6822
+  * Set correct UTF-8 email subject header (RFC1342) #6369
 * Misc
-  * Catch exception when trusted cert is not readable during node setup on agent/satellite #7838 https://github.com/Icinga/icinga2/pull/7838 
-  * DaemonUtility#ValidateConfigFiles(): re-try unknown zones once they may have become known https://github.com/Icinga/icinga2/pull/7546
-  * CheckCommand ssl: s/-N/--sni/ #7741 https://github.com/Icinga/icinga2/pull/7741/files
-  * Small doc fixes
+  * Catch exception when trusted cert is not readable during node setup on agent/satellite #7838
+  * CheckCommand ssl: Fix wrong parameter `-N` #7741
+  * Code quality fixes
+  * Small documentation fixes
 
 ## 2.11.3 (2020-03-02)
 
