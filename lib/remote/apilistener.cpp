@@ -995,28 +995,49 @@ void ApiListener::PersistMessage(const Dictionary::Ptr& message, const ConfigObj
 
 	ASSERT(ts != 0);
 
-	Dictionary::Ptr pmessage = new Dictionary();
-	pmessage->Set("timestamp", ts);
+	auto localZone (Zone::GetLocalZone());
+	std::set<Zone::Ptr> targetZones ({localZone});
 
-	pmessage->Set("message", JsonEncode(message));
+	{
+		auto parent (localZone->GetParent());
 
-	if (secobj) {
-		Dictionary::Ptr secname = new Dictionary();
-		secname->Set("type", secobj->GetReflectionType()->GetName());
-		secname->Set("name", secobj->GetName());
-		pmessage->Set("secobj", secname);
+		if (parent) {
+			targetZones.emplace(std::move(parent));
+		}
 	}
 
-	boost::mutex::scoped_lock lock(m_LogLock);
-	if (m_LogFile) {
-		NetString::WriteStringToStream(m_LogFile, JsonEncode(pmessage));
-		m_LogMessageCount++;
-		SetLogMessageTimestamp(ts);
+	for (auto& zone : ConfigType::GetObjectsByType<Zone>()) {
+		/* immediate child zone */
+		if (zone->GetParent() == localZone) {
+			targetZones.emplace(zone);
+		}
+	}
 
-		if (m_LogMessageCount > 50000) {
-			CloseLogFile();
-			RotateLogFile();
-			OpenLogFile();
+	if (secobj) {
+		auto current (targetZones.begin());
+		auto end (targetZones.end());
+
+		while (current != end) {
+			if ((*current)->CanAccessObject(secobj)) {
+				++current;
+			} else {
+				targetZones.erase(current++);
+			}
+		}
+	}
+
+	std::set<Endpoint::Ptr> targetEndpoints;
+
+	for (auto& zone : targetZones) {
+		auto endpoints (zone->GetEndpoints());
+		targetEndpoints.insert(endpoints.begin(), endpoints.end());
+	}
+
+	targetEndpoints.erase(GetLocalEndpoint());
+
+	for (auto& endpoint : targetEndpoints) {
+		if (ts > endpoint->GetLocalLogPosition()) {
+			endpoint->GetReplayLog().Log(ts, JsonEncode(message));
 		}
 	}
 }
@@ -1204,7 +1225,6 @@ void ApiListener::OpenLogFile()
 	}
 
 	m_LogFile = new StdioStream(fp, true);
-	m_LogMessageCount = 0;
 	SetLogMessageTimestamp(Utility::GetTime());
 }
 
