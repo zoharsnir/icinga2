@@ -191,10 +191,6 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/lib
 )
 
-if(HAVE_LIBEXECINFO)
-  list(APPEND base_DEPS execinfo)
-endif()
-
 if(UNIX OR CYGWIN)
   list(APPEND base_OBJS $<TARGET_OBJECTS:execvpe>)
 endif()
@@ -224,13 +220,6 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_FULL_LIBDIR}/ici
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Qunused-arguments -fcolor-diagnostics")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
-
-  # Clang on Fedora requires -pthread, Apple Clang does not
-  # AppleClang is available since CMake 3.0.0
-  if (NOT CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-  endif()
 endif()
 
 if(CMAKE_C_COMPILER_ID STREQUAL "SunPro")
@@ -349,12 +338,7 @@ check_function_exists(backtrace_symbols HAVE_BACKTRACE_SYMBOLS)
 check_function_exists(pipe2 HAVE_PIPE2)
 check_function_exists(nice HAVE_NICE)
 check_library_exists(dl dladdr "dlfcn.h" HAVE_DLADDR)
-check_library_exists(execinfo backtrace_symbols "" HAVE_LIBEXECINFO)
 check_include_file_cxx(cxxabi.h HAVE_CXXABI_H)
-
-if(HAVE_LIBEXECINFO)
-  set(HAVE_BACKTRACE_SYMBOLS TRUE)
-endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   exec_program(${CMAKE_CXX_COMPILER}
