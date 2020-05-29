@@ -82,6 +82,9 @@ protected:
 	void Start(bool runtimeCreated) override;
 	void Stop(bool runtimeRemoved) override;
 
+	virtual void Register();
+	virtual void Unregister();
+
 private:
 	static std::mutex m_Mutex;
 	static std::set<Logger::Ptr> m_Loggers;

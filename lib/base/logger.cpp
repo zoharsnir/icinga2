@@ -50,19 +50,25 @@ INITIALIZE_ONCE([]() {
 void Logger::Start(bool runtimeCreated)
 {
 	ObjectImpl<Logger>::Start(runtimeCreated);
-
-	std::unique_lock<std::mutex> lock(m_Mutex);
-	m_Loggers.insert(this);
+	Register();
 }
 
 void Logger::Stop(bool runtimeRemoved)
 {
-	{
-		std::unique_lock<std::mutex> lock(m_Mutex);
-		m_Loggers.erase(this);
-	}
-
+	Unregister();
 	ObjectImpl<Logger>::Stop(runtimeRemoved);
+}
+
+void Logger::Register()
+{
+	std::unique_lock<std::mutex> lock(m_Mutex);
+	m_Loggers.insert(this);
+}
+
+void Logger::Unregister()
+{
+	std::unique_lock<std::mutex> lock(m_Mutex);
+	m_Loggers.erase(this);
 }
 
 std::set<Logger::Ptr> Logger::GetLoggers()
