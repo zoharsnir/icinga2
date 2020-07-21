@@ -1,4 +1,4 @@
-local Pipeline(version, os) = {
+local Pipeline(os) = {
   kind: "pipeline",
   type: "kubernetes",
   name: os,
