@@ -14,7 +14,7 @@ local Pipeline(os) = {
       ],
       resources: {
         requests: {
-          cpu: 2000
+          cpu: 2000,
           memory: 2GiB
         }
       }
