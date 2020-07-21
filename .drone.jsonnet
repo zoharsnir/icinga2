@@ -3,7 +3,7 @@ local Pipeline(os) = {
   type: "kubernetes",
   name: os,
   metadata: {
-    namespace: "drone",
+    namespace: "drone"
   },
   steps: [
     {
@@ -11,7 +11,13 @@ local Pipeline(os) = {
       image: "registry.icinga.com/build-docker/" + os,
       commands: [
         "./.drone.sh",
-      ]
+      ],
+      resources: {
+        requests: {
+          cpu: 2000
+          memory: 2GiB
+        }
+      }
     }
   ]
 };
