@@ -1,4 +1,0 @@
-packages:
-  image: registry.icinga.com/build-docker/debian/buster
-  script:
-    - ./.drone.sh

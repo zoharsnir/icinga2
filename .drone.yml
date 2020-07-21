@@ -1,0 +1,11 @@
+kind: pipeline
+type: kubernetes
+
+metadata:
+  namespace: drone
+
+steps:
+- name: build
+  image: registry.icinga.com/build-docker/debian/buster
+  commands:
+  - ./.drone.sh
