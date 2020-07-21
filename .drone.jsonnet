@@ -5,6 +5,9 @@ local Pipeline(os) = {
   metadata: {
     namespace: "drone",
   },
+  node_selector: {
+    magnum.openstack.org/nodegroup: build-worker,
+  },
   steps: [
     {
       name: "build",
@@ -14,8 +17,12 @@ local Pipeline(os) = {
       ],
       resources: {
         requests: {
-          cpu: 2000,
-          memory: "2GiB",
+          cpu: 3000,
+          memory: "3GiB",
+        },
+        limits: {
+          cpu: 3000,
+          memory: "3GiB",
         }
       }
     }
