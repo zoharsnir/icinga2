@@ -18,6 +18,7 @@ local Pipeline(os) = {
 
 [
   Pipeline("debian/buster"),
+  Pipeline("debian/stretch"),
   Pipeline("ubuntu/focal"),
-  Pipeline("centos/7"),
+  Pipeline("ubuntu/eoan"),
 ]
