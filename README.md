@@ -1,18 +1,4 @@
 
-# Icinga 2
-
-![Icinga Logo](https://icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
-
-#### Table of Contents
-
-1. [About][About]
-2. [Installation][Installation]
-3. [Documentation][Documentation]
-4. [Support][Support]
-5. [License][License]
-6. [Contributing][Contributing]
-
-## About
 
 [Icinga](https://icinga.com/products/) is a monitoring system which checks
 the availability of your network resources, notifies users of outages, and generates
