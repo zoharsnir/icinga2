@@ -1,12 +1,4 @@
 
-
-[Icinga](https://icinga.com/products/) is a monitoring system which checks
-the availability of your network resources, notifies users of outages, and generates
-performance data for reporting.
-
-Scalable and extensible, Icinga can monitor large, complex environments across
-multiple locations.
-
 Icinga 2 is the monitoring server and requires [Icinga Web 2](https://icinga.com/products/)
 on top in your Icinga Stack. The [configuration](https://icinga.com/products/configuration/)
 can be easily managed with either the [Icinga Director](https://icinga.com/docs/director/latest/),
