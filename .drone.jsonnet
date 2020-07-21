@@ -3,8 +3,8 @@ local Pipeline(os) = {
   type: "kubernetes",
   name: os,
   metadata: {
-    namespace: "drone"
-  }
+    namespace: "drone",
+  },
   steps: [
     {
       name: "build",
