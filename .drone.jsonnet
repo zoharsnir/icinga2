@@ -6,7 +6,7 @@ local Pipeline(os) = {
     namespace: "drone",
   },
   node_selector: {
-    magnum.openstack.org/nodegroup: "build-worker",
+    "magnum.openstack.org/nodegroup": "build-worker",
   },
   steps: [
     {
