@@ -203,7 +203,7 @@ void WorkQueue::StatusTimerHandler()
 
 	String timeInfo;
 
-	if (pending > GetTaskCount(5)) {
+	if (pending > m_TaskStats.CalculateRate(Utility::GetTime(), 5)) {
 		timeInfo = " empty in ";
 		if (timeToZero < 0 || std::isinf(timeToZero))
 			timeInfo += "infinite time, your task handler isn't able to keep up";
@@ -219,8 +219,8 @@ void WorkQueue::StatusTimerHandler()
 		Log(LogInformation, "WorkQueue")
 			<< "#" << m_ID << " (" << m_Name << ") "
 			<< "items: " << pending << ", "
-			<< "rate: " << std::setw(2) << GetTaskCount(60) / 60.0 << "/s "
-			<< "(" << GetTaskCount(60) << "/min " << GetTaskCount(60 * 5) << "/5min " << GetTaskCount(60 * 15) << "/15min);"
+			<< "rate: " << std::setw(2) << m_TaskStats.CalculateRate(Utility::GetTime(), 60) / 60.0 << "/s "
+			<< "(" << m_TaskStats.CalculateRate(Utility::GetTime(), 60) << "/min " << m_TaskStats.CalculateRate(Utility::GetTime(), 60 * 5) << "/5min " << m_TaskStats.CalculateRate(Utility::GetTime(), 60 * 15) << "/15min);"
 			<< timeInfo;
 	}
 
