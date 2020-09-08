@@ -84,6 +84,14 @@ void IdoMysqlConnection::Resume()
 	m_ReconnectTimer->OnTimerExpired.connect(std::bind(&IdoMysqlConnection::ReconnectTimerHandler, this));
 	m_ReconnectTimer->Start();
 
+	m_QueryLogTimer = new Timer();
+	m_QueryLogTimer->SetInterval(10);
+	m_QueryLogTimer->OnTimerExpired.connect([this]() {
+		Log(LogInformation, "DEBUG") << "NotReadyQueries: " << m_NotReadyQueries.load();
+		Log(LogInformation, "DEBUG") << "DoneQueries: " << m_DoneQueries.load();
+	});
+	m_QueryLogTimer->Start();
+
 	/* Start with queries after connect. */
 	DbConnection::Resume();
 
@@ -958,7 +966,7 @@ void IdoMysqlConnection::InternalExecuteMultipleQueries(const std::vector<DbQuer
 		ASSERT(query.Type == DbQueryNewTransaction || query.Category != DbCatInvalid);
 
 		if (!CanExecuteQuery(query)) {
-
+			m_NotReadyQueries.fetch_add(1);
 #ifdef I2_DEBUG /* I2_DEBUG */
 			Log(LogDebug, "IdoMysqlConnection")
 				<< "Scheduling multiple execute query task again: Cannot execute query now. Type '"
@@ -999,7 +1007,7 @@ void IdoMysqlConnection::InternalExecuteQuery(const DbQuery& query, int typeOver
 
 	/* check if there are missing object/insert ids and re-enqueue the query */
 	if (!CanExecuteQuery(query)) {
-
+		m_NotReadyQueries.fetch_add(1);
 #ifdef I2_DEBUG /* I2_DEBUG */
 		Log(LogDebug, "IdoMysqlConnection")
 			<< "Scheduling execute query task again: Cannot execute query now. Type '"
@@ -1143,6 +1151,8 @@ void IdoMysqlConnection::InternalExecuteQuery(const DbQuery& query, int typeOver
 
 void IdoMysqlConnection::FinishExecuteQuery(const DbQuery& query, int type, bool upsert)
 {
+	m_DoneQueries.fetch_add(1);
+
 	if (upsert && GetAffectedRows() == 0) {
 
 #ifdef I2_DEBUG /* I2_DEBUG */

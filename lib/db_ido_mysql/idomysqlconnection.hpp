@@ -52,6 +52,10 @@ protected:
 	void NewTransaction() override;
 
 private:
+	Atomic<uint_fast64_t> m_NotReadyQueries{0};
+	Atomic<uint_fast64_t> m_DoneQueries{0};
+	Timer::Ptr m_QueryLogTimer;
+
 	DbReference m_InstanceID;
 
 	WorkQueue m_QueryQueue{10000000};
