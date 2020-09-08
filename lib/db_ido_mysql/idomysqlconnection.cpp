@@ -86,7 +86,7 @@ void IdoMysqlConnection::Resume()
 
 	m_QueryLogTimer = new Timer();
 	m_QueryLogTimer->SetInterval(10);
-	m_QueryLogTimer->OnTimerExpired.connect([this]() {
+	m_QueryLogTimer->OnTimerExpired.connect([this](const Timer * const&) {
 		Log(LogInformation, "DEBUG") << "NotReadyQueries: " << m_NotReadyQueries.load();
 		Log(LogInformation, "DEBUG") << "DoneQueries: " << m_DoneQueries.load();
 	});
