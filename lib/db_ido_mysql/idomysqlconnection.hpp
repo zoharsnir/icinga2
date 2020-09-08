@@ -53,7 +53,10 @@ protected:
 
 private:
 	Atomic<uint_fast64_t> m_NotReadyQueries{0};
+	Atomic<uint_fast64_t> m_LastNotReadyQueries{0};
 	Atomic<uint_fast64_t> m_DoneQueries{0};
+	Atomic<uint_fast64_t> m_LastDoneQueries{0};
+	Atomic<uint_fast64_t> m_LastLog{(uint_fast64_t)Utility::GetTime()};
 	Timer::Ptr m_QueryLogTimer;
 
 	DbReference m_InstanceID;
