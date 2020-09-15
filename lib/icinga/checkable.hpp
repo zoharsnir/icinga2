@@ -173,6 +173,7 @@ public:
 
 	bool NotificationReasonApplies(NotificationType type);
 	bool IsLikelyToBeCheckedSoon();
+	double GetIntervalShuffleFactor();
 
 	static void IncreasePendingChecks();
 	static void DecreasePendingChecks();
