@@ -63,6 +63,14 @@ void Checkable::Start(bool runtimeCreated)
 {
 	double now = Utility::GetTime();
 
+	{
+		auto cr (GetLastCheckResult());
+
+		if (GetLastCheckStarted() > (cr ? cr->GetExecutionEnd() : 0.0)) {
+			SetNextCheck(GetLastCheckStarted());
+		}
+	}
+
 	if (GetNextCheck() < now + 60) {
 		double delta = std::min(GetCheckInterval(), 60.0);
 		delta *= (double)std::rand() / RAND_MAX;
@@ -143,15 +151,7 @@ void Checkable::ClearAcknowledgement(const String& removedBy, double changeTime,
 {
 	ObjectLock oLock (this);
 
-	bool wasAcked;
-
-	if (GetAcknowledgementRaw() == AcknowledgementNone) {
-		wasAcked = false;
-	} else {
-		double expiry = GetAcknowledgementExpiry();
-
-		wasAcked = expiry == 0 || expiry >= Utility::GetTime();
-	}
+	bool wasAcked = GetAcknowledgementRaw() != AcknowledgementNone;
 
 	SetAcknowledgementRaw(AcknowledgementNone);
 	SetAcknowledgementExpiry(0);
