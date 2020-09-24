@@ -150,7 +150,7 @@ void DbConnection::UpdateProgramStatus()
 	DbQuery query1;
 	query1.Table = "programstatus";
 	query1.IdColumn = "programstatus_id";
-	query1.Type = DbQueryInsert | DbQueryUpdate;
+	query1.Type = DbQueryInsert | DbQueryDelete;
 	query1.Category = DbCatProgramStatus;
 
 	query1.Fields = new Dictionary({
