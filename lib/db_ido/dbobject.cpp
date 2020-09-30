@@ -403,6 +403,7 @@ void DbObject::VarsChangedHandler(const CustomVarObject::Ptr& object)
 
 void DbObject::VersionChangedHandler(const ConfigObject::Ptr& object)
 {
+	Log(LogWarning, "LOLCAT") << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << object->GetVersion();
 	DbObject::Ptr dbobj = DbObject::GetOrCreateByObject(object);
 
 	if (dbobj) {
