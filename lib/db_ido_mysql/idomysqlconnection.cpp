@@ -165,8 +165,8 @@ void IdoMysqlConnection::NewTransaction()
 		<< "Scheduling new transaction and finishing async queries.";
 #endif /* I2_DEBUG */
 
-	m_QueryQueue.Enqueue(std::bind(&IdoMysqlConnection::InternalNewTransaction, this), PriorityNormal);
-	m_QueryQueue.Enqueue(std::bind(&IdoMysqlConnection::FinishAsyncQueries, this), PriorityNormal);
+	m_QueryQueue.Enqueue(std::bind(&IdoMysqlConnection::InternalNewTransaction, this), PriorityImmediate);
+	m_QueryQueue.Enqueue(std::bind(&IdoMysqlConnection::FinishAsyncQueries, this), PriorityImmediate);
 }
 
 void IdoMysqlConnection::InternalNewTransaction()
@@ -459,7 +459,16 @@ void IdoMysqlConnection::Reconnect()
 		DeactivateObject(dbobj);
 	}
 
-	UpdateAllObjects();
+	for (const Type::Ptr& type : Type::GetAllTypes()) {
+		auto *dtype = dynamic_cast<ConfigType *>(type.get());
+
+		if (!dtype)
+			continue;
+
+		for (const ConfigObject::Ptr& object : dtype->GetObjects()) {
+			m_QueryQueue.Enqueue([this, object](){ UpdateObject(object); }, PriorityHigh);
+		}
+	}
 
 #ifdef I2_DEBUG /* I2_DEBUG */
 	Log(LogDebug, "IdoMysqlConnection")

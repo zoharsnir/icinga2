@@ -177,7 +177,7 @@ void DbConnection::UpdateProgramStatus()
 		{ "instance_id", 0 }  /* DbConnection class fills in real ID */
 	});
 
-	query1.Priority = PriorityHigh;
+	query1.Priority = PriorityImmediate;
 	queries.emplace_back(std::move(query1));
 
 	DbQuery query2;
