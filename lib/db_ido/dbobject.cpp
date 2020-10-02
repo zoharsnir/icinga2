@@ -13,6 +13,7 @@
 #include "base/configobject.hpp"
 #include "base/configtype.hpp"
 #include "base/json.hpp"
+#include "base/object-packer.hpp"
 #include "base/serializer.hpp"
 #include "base/json.hpp"
 #include "base/convert.hpp"
@@ -104,7 +105,7 @@ String DbObject::HashValue(const Value& value)
 	else
 		temp = value;
 
-	return SHA256(JsonEncode(temp));
+	return SHA256(PackObject(temp));
 }
 
 void DbObject::SendConfigUpdateHeavy(const Dictionary::Ptr& configFields)
