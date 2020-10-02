@@ -13,6 +13,7 @@
 #include "base/logger.hpp"
 #include "base/exception.hpp"
 #include "base/json.hpp"
+#include "base/serializer.hpp"
 
 using namespace icinga;
 
