@@ -474,7 +474,7 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 	Array::Ptr data = new Array();
 	data->Add(configFieldsDup);
 
-	CustomVarObject::Ptr custom_var_object = dynamic_pointer_cast<CustomVarObject>(GetObject());
+	CustomVarObject::Ptr custom_var_object = dynamic_pointer_cast<CustomVarObject>(dbobj->GetObject());
 
 	if (custom_var_object)
 		data->Add(custom_var_object->GetVars());
