@@ -458,7 +458,38 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 			String cachedHash = GetConfigHash(dbobj);
 
 			if (cachedHash != configHash) {
-				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName();
+	Dictionary::Ptr configFieldsDup = configFields->ShallowClone();
+
+	{
+		ObjectLock olock(configFieldsDup);
+
+		for (const Dictionary::Pair& kv : configFieldsDup) {
+			if (kv.second.IsObjectType<ConfigObject>()) {
+				ConfigObject::Ptr obj = kv.second;
+				configFieldsDup->Set(kv.first, obj->GetName());
+			}
+		}
+	}
+
+	Array::Ptr data = new Array();
+	data->Add(configFieldsDup);
+
+	CustomVarObject::Ptr custom_var_object = dynamic_pointer_cast<CustomVarObject>(GetObject());
+
+	if (custom_var_object)
+		data->Add(custom_var_object->GetVars());
+
+	Value value = data;
+	Value temp;
+
+	Type::Ptr type = value.GetReflectionType();
+
+	if (ConfigObject::TypeInstance->IsAssignableFrom(type))
+		temp = Serialize(value, FAConfig);
+	else
+		temp = value;
+
+				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << JsonEncode(temp);
 				dbobj->SendConfigUpdateHeavy(configFields);
 				dbobj->SendStatusUpdate();
 			} else {
