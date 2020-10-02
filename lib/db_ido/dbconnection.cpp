@@ -458,6 +458,7 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 			String cachedHash = GetConfigHash(dbobj);
 
 			if (cachedHash != configHash) {
+				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName();
 				dbobj->SendConfigUpdateHeavy(configFields);
 				dbobj->SendStatusUpdate();
 			} else {
