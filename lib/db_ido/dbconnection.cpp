@@ -12,6 +12,7 @@
 #include "base/utility.hpp"
 #include "base/logger.hpp"
 #include "base/exception.hpp"
+#include "base/json.hpp"
 
 using namespace icinga;
 
