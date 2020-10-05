@@ -33,7 +33,7 @@ Dictionary::Ptr EndpointDbObject::GetConfigFields() const
 
 	return new Dictionary({
 		{ "identity", endpoint->GetName() },
-		{ "node", IcingaApplication::GetInstance()->GetNodeName() },
+		//{ "node", IcingaApplication::GetInstance()->GetNodeName() },
 		{ "zone_object_id", endpoint->GetZone() }
 	});
 }
@@ -48,7 +48,7 @@ Dictionary::Ptr EndpointDbObject::GetStatusFields() const
 
 	return new Dictionary({
 		{ "identity", endpoint->GetName() },
-		{ "node", IcingaApplication::GetInstance()->GetNodeName() },
+		//{ "node", IcingaApplication::GetInstance()->GetNodeName() },
 		{ "zone_object_id", endpoint->GetZone() },
 		{ "is_connected", EndpointIsConnected(endpoint) }
 	});
