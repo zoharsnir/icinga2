@@ -491,7 +491,7 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 	else
 		temp = value;
 
-				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << JsonEncode(temp);
+				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << cachedHash << " != " << configHash << " " << JsonEncode(temp);
 				dbobj->SendConfigUpdateHeavy(configFields);
 				dbobj->SendStatusUpdate();
 			} else {
