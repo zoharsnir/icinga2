@@ -499,7 +499,7 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 					auto po (PackObject(temp));
 					char buf[3];
 					for (auto& c : po.GetData()) {
-						sprintf(buf, "%02x", (unsigned)c);
+						sprintf(buf, "%02x", (unsigned)(unsigned char)c);
 						msg << (char*)buf;
 					}
 				}
