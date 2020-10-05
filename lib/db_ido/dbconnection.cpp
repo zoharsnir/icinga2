@@ -9,11 +9,13 @@
 #include "base/configtype.hpp"
 #include "base/convert.hpp"
 #include "base/objectlock.hpp"
+#include "base/object-packer.hpp"
 #include "base/utility.hpp"
 #include "base/logger.hpp"
 #include "base/exception.hpp"
 #include "base/json.hpp"
 #include "base/serializer.hpp"
+#include <cstdio>
 
 using namespace icinga;
 
@@ -455,7 +457,6 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 			Dictionary::Ptr configFields = dbobj->GetConfigFields();
 			String configHash = dbobj->CalculateConfigHash(configFields);
 			ASSERT(configHash.GetLength() <= 64);
-			configFields->Set("config_hash", configHash);
 
 			String cachedHash = GetConfigHash(dbobj);
 
@@ -491,10 +492,23 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 	else
 		temp = value;
 
-				Log(LogCritical, "config_hash") << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << cachedHash << " != " << configHash << " " << JsonEncode(temp);
+				{
+					Log msg (LogCritical, "config_hash");
+					msg << object->GetReflectionType()->GetName() << " " << object->GetName() << " " << cachedHash << " != " << configHash << " ";
+
+					auto po (PackObject(temp));
+					char buf[3];
+					for (auto& c : po.GetData()) {
+						sprintf(buf, "%02x", (unsigned)c);
+						msg << (char*)buf;
+					}
+				}
+
+			configFields->Set("config_hash", configHash);
 				dbobj->SendConfigUpdateHeavy(configFields);
 				dbobj->SendStatusUpdate();
 			} else {
+			configFields->Set("config_hash", configHash);
 				dbobj->SendConfigUpdateLight();
 			}
 		} else if (!active) {
