@@ -12,6 +12,7 @@
 #include "remote/endpoint.hpp"
 #include "base/configobject.hpp"
 #include "base/configtype.hpp"
+#include "base/defer.hpp"
 #include "base/json.hpp"
 #include "base/object-packer.hpp"
 #include "base/serializer.hpp"
@@ -68,6 +69,8 @@ DbType::Ptr DbObject::GetType() const
 	return m_Type;
 }
 
+static thread_local ConfigObject::Ptr ToBeHashed;
+
 String DbObject::CalculateConfigHash(const Dictionary::Ptr& configFields) const
 {
 	Dictionary::Ptr configFieldsDup = configFields->ShallowClone();
@@ -91,6 +94,8 @@ String DbObject::CalculateConfigHash(const Dictionary::Ptr& configFields) const
 	if (custom_var_object)
 		data->Add(custom_var_object->GetVars());
 
+	ToBeHashed = GetObject();
+	Defer tbh ([]() { ToBeHashed = nullptr; });
 	return HashValue(data);
 }
 
@@ -104,6 +109,10 @@ String DbObject::HashValue(const Value& value)
 		temp = Serialize(value, FAConfig);
 	else
 		temp = value;
+
+	if (ToBeHashed) {
+		Log(LogWarning, "hashy") << ToBeHashed->GetReflectionType()->GetName() << " " << ToBeHashed->GetName() << " " << SHA256(PackObject(temp)) << " " << JsonEncode(temp);
+	}
 
 	return SHA256(PackObject(temp));
 }
