@@ -25,6 +25,9 @@
 
 using namespace icinga;
 
+thread_local String icinga::l_LastHashed;
+thread_local String icinga::l_LastHash;
+
 boost::signals2::signal<void (const DbQuery&)> DbObject::OnQuery;
 boost::signals2::signal<void (const std::vector<DbQuery>&)> DbObject::OnMultipleQueries;
 
