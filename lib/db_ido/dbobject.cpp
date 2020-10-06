@@ -114,7 +114,11 @@ String DbObject::HashValue(const Value& value)
 		Log(LogWarning, "hashy") << ToBeHashed->GetReflectionType()->GetName() << " " << ToBeHashed->GetName() << " " << SHA256(PackObject(temp)) << " " << JsonEncode(temp);
 	}
 
-	return SHA256(PackObject(temp));
+	auto raw (PackObject(temp));
+	l_LastHashed = raw;
+	auto h (SHA256(raw));
+	l_LastHash = h;
+	return h;
 }
 
 void DbObject::SendConfigUpdateHeavy(const Dictionary::Ptr& configFields)

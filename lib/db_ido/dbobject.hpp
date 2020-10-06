@@ -37,6 +37,9 @@ enum DbObjectType
 	DbObjectTypeZone = 14,
 };
 
+thread_local String l_LastHashed;
+thread_local String l_LastHash;
+
 /**
  * A database object.
  *

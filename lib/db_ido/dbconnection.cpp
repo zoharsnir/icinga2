@@ -456,6 +456,8 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 
 			Dictionary::Ptr configFields = dbobj->GetConfigFields();
 			String configHash = dbobj->CalculateConfigHash(configFields);
+			auto raw (l_LastHashed);
+			auto h (l_LastHash);
 			ASSERT(configHash.GetLength() <= 64);
 
 			String cachedHash = GetConfigHash(dbobj);
@@ -498,7 +500,7 @@ void DbConnection::UpdateObject(const ConfigObject::Ptr& object)
 
 					auto po (PackObject(temp));
 					char buf[3];
-					for (auto& c : po.GetData()) {
+					for (auto& c : raw.GetData()) {
 						sprintf(buf, "%02x", (unsigned)(unsigned char)c);
 						msg << (char*)buf;
 					}
