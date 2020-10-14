@@ -1,2 +1,2 @@
-#define VERSION "${GIT_VERSION}"
+#define VERSION "r2.11.6-1"
 #define ICINGA2_VERSION "${ICINGA2_VERSION}"
