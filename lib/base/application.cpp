@@ -15,10 +15,12 @@
 #include "base/scriptglobal.hpp"
 #include "base/process.hpp"
 #include "base/tlsutility.hpp"
+#include <algorithm>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/exception/errinfo_api_function.hpp>
 #include <boost/exception/errinfo_errno.hpp>
 #include <boost/exception/errinfo_file_name.hpp>
+#include <cstring>
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -56,11 +58,12 @@ double Application::m_StartTime;
 bool Application::m_ScriptDebuggerEnabled = false;
 
 #ifdef _WIN32
-double Application::m_LastReloadFailed = 0;
+Application::LastFailedReload Application::m_LastReloadFailed;
+std::mutex Application::m_LastReloadFailedMutex;
 #else /* _WIN32 */
-std::atomic<double>* Application::m_LastReloadFailed = ([]() -> std::atomic<double>* {
+Application::LastFailedReload* Application::m_LastReloadFailed = ([]() -> Application::LastFailedReload* {
 	auto memory (mmap(
-		nullptr, sizeof(std::atomic<double>),
+		nullptr, sizeof(Application::LastFailedReload),
 		PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED, -1, 0
 	));
 	if (memory == MAP_FAILED) {
@@ -69,8 +72,11 @@ std::atomic<double>* Application::m_LastReloadFailed = ([]() -> std::atomic<doub
 			<< boost::errinfo_errno(errno));
 	}
 
-	auto lrf ((std::atomic<double>*)memory);
-	lrf->store(0);
+	auto lrf ((Application::LastFailedReload*)memory);
+
+	lrf->When.store(0);
+	std::fill((volatile char*)lrf->Why, (volatile char*)lrf->Why + sizeof(lrf->Why), 0);
+
 	return lrf;
 })();
 #endif /* _WIN32 */
@@ -383,7 +389,7 @@ void Application::OnShutdown()
 static void ReloadProcessCallbackInternal(const ProcessResult& pr)
 {
 	if (pr.ExitStatus != 0) {
-		Application::SetLastReloadFailed(Utility::GetTime());
+		Application::SetLastReloadFailed(Utility::GetTime(), pr.Output);
 		Log(LogCritical, "Application", "Found error in config: reloading aborted");
 	}
 #ifdef _WIN32
@@ -1188,21 +1194,30 @@ void Application::SetScriptDebuggerEnabled(bool enabled)
 	m_ScriptDebuggerEnabled = enabled;
 }
 
-double Application::GetLastReloadFailed()
+std::pair<double, String> Application::GetLastReloadFailed()
 {
 #ifdef _WIN32
-	return m_LastReloadFailed;
+	std::unique_lock<std::mutex> lock (m_LastReloadFailedMutex);
+	return std::pair<double, String>(m_LastReloadFailed.When, m_LastReloadFailed.Why);
 #else /* _WIN32 */
-	return m_LastReloadFailed->load();
+	char reason[sizeof(m_LastReloadFailed->Why)];
+	std::copy((volatile char*)m_LastReloadFailed->Why, (volatile char*)m_LastReloadFailed->Why + sizeof(m_LastReloadFailed->Why), (char*)reason);
+
+	return std::pair<double, String>(m_LastReloadFailed->When.load(), String((char*)reason));
 #endif /* _WIN32 */
 }
 
-void Application::SetLastReloadFailed(double ts)
+void Application::SetLastReloadFailed(double ts, const String& reason)
 {
 #ifdef _WIN32
-	m_LastReloadFailed = ts;
+	std::unique_lock<std::mutex> lock (m_LastReloadFailedMutex);
+	m_LastReloadFailed = LastFailedReload{ts, reason};
 #else /* _WIN32 */
-	m_LastReloadFailed->store(ts);
+	char buf[sizeof(m_LastReloadFailed->Why)] = {0};
+
+	(void)strncpy((char*)buf, reason.CStr(), sizeof(buf));
+	std::copy((char*)buf, (char*)buf + sizeof(buf), (volatile char*)m_LastReloadFailed->Why);
+	m_LastReloadFailed->When.store(ts);
 #endif /* _WIN32 */
 }
 

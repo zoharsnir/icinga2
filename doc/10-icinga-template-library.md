@@ -84,6 +84,7 @@ Name                   | Description
 -----------------------|---------------
 icinga\_min\_version   | **Optional.** Required minimum Icinga 2 version, e.g. `2.8.0`. If not satisfied, the state changes to `Critical`. Release packages only.
 icinga\_perfdata       | **Optional.** Only yield the given performance data. E.g. `[ "*_latency", "*_execution_time" ]`
+icinga\_verbose        | **Optional.** If the last reload failed, tell the reason.
 
 ### cluster <a id="itl-icinga-cluster"></a>
 

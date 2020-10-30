@@ -10,6 +10,7 @@
 #include "base/atomic.hpp"
 #include "base/defer.hpp"
 #include "base/logger.hpp"
+#include "base/streamlogger.hpp"
 #include "base/application.hpp"
 #include "base/timer.hpp"
 #include "base/utility.hpp"
@@ -23,6 +24,7 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -233,6 +235,13 @@ int RunWorker(const std::vector<std::string>& configs, bool closeConsoleLog = fa
 	}
 #endif /* I2_DEBUG */
 
+	std::ostringstream oss;
+	StreamLogger::Ptr sl = new StreamLogger();
+
+	sl->BindStream(&oss, false);
+	sl->Start(true);
+	sl->SetActive(true);
+
 	Log(LogInformation, "cli", "Loading configuration file(s).");
 
 	{
@@ -240,8 +249,17 @@ int RunWorker(const std::vector<std::string>& configs, bool closeConsoleLog = fa
 
 		if (!DaemonUtility::LoadConfigFiles(configs, newItems, Configuration::ObjectsPath, Configuration::VarsPath)) {
 			Log(LogCritical, "cli", "Config validation failed. Re-run with 'icinga2 daemon -C' after fixing the config.");
+
+			sl->Stop(true);
+			sl = nullptr;
+			Application::SetLastReloadFailed(Utility::GetTime(), oss.str());
+
 			return EXIT_FAILURE;
 		}
+
+		sl->Stop(true);
+		sl = nullptr;
+		oss = decltype(oss)();
 
 #ifndef _WIN32
 		Log(LogNotice, "cli")
@@ -477,6 +495,7 @@ static pid_t StartUnixWorker(const std::vector<std::string>& configs, bool close
 			}
 
 			(void)sigprocmask(SIG_UNBLOCK, &l_UnixWorkerSignals, nullptr);
+			Application::SetLastReloadFailed(Utility::GetTime(), "fork() failed");
 			return -1;
 
 		case 0:
@@ -511,11 +530,13 @@ static pid_t StartUnixWorker(const std::vector<std::string>& configs, bool close
 				} catch (const std::exception& ex) {
 					Log(LogCritical, "cli")
 						<< "Failed to re-initialize thread pool after forking (child): " << DiagnosticInformation(ex);
+					Application::SetLastReloadFailed(Utility::GetTime(), "Failed to re-initialize thread pool after forking (child)");
 					_exit(EXIT_FAILURE);
 				}
 
 				_exit(RunWorker(configs, closeConsoleLog, stderrFile));
 			} catch (...) {
+				Application::SetLastReloadFailed(Utility::GetTime(), "");
 				_exit(EXIT_FAILURE);
 			}
 
@@ -767,12 +788,11 @@ int DaemonCommand::Run(const po::variables_map& vm, const std::vector<std::strin
 
 			if (nextWorker == -1) {
 				Log(LogCritical, "Application", "Found error in config: reloading aborted");
-				Application::SetLastReloadFailed(Utility::GetTime());
 			} else {
 				Log(LogInformation, "Application")
 					<< "Reload done, old process shutting down. Child process with PID '" << nextWorker << "' is taking over.";
 
-				Application::SetLastReloadFailed(0);
+				Application::SetLastReloadFailed(0, "");
 				(void)kill(currentWorker, SIGTERM);
 
 				{

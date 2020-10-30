@@ -50,6 +50,9 @@ void IcingaCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRes
 	auto perfdataFilter (MacroProcessor::ResolveMacros("$icinga_perfdata$", resolvers, checkable->GetLastCheckResult(),
 		nullptr, MacroProcessor::EscapeCallback(), resolvedMacros, useResolvedMacros));
 
+	auto verbose (MacroProcessor::ResolveMacros("$icinga_verbose$", resolvers, checkable->GetLastCheckResult(),
+		nullptr, MacroProcessor::EscapeCallback(), resolvedMacros, useResolvedMacros));
+
 	if (resolvedMacros && !useResolvedMacros)
 		return;
 
@@ -163,10 +166,17 @@ void IcingaCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRes
 		". Version: " + appVersion;
 
 	/* Indicate a warning if the last reload failed. */
-	double lastReloadFailed = Application::GetLastReloadFailed();
+	auto lastReloadFailed (Application::GetLastReloadFailed());
+	String verboseText;
 
-	if (lastReloadFailed > 0) {
-		output += "; Last reload attempt failed at " + Utility::FormatDateTime("%Y-%m-%d %H:%M:%S %z", lastReloadFailed);
+	if (lastReloadFailed.first > 0) {
+		output += "; Last reload attempt failed at " + Utility::FormatDateTime("%Y-%m-%d %H:%M:%S %z", lastReloadFailed.first);
+
+		if (verbose.ToBool() && lastReloadFailed.second.GetLength()) {
+			output += " (reason: see below)";
+			verboseText = lastReloadFailed.second;
+		}
+
 		state =ServiceWarning;
 	}
 
@@ -190,6 +200,10 @@ void IcingaCheckTask::ScriptFunc(const Checkable::Ptr& checkable, const CheckRes
 	if (missingIcingaMinVersion.IsEmpty() && !icingaMinVersion.IsEmpty() && Utility::CompareVersion(icingaMinVersion, parsedAppVersion) < 0) {
 		output += "; Minimum version " + icingaMinVersion + " is not installed.";
 		state = ServiceCritical;
+	}
+
+	if (verboseText.GetLength()) {
+		output += "\n\n" + verboseText;
 	}
 
 	String commandName = command->GetName();
