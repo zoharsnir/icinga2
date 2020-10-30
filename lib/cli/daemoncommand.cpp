@@ -437,7 +437,17 @@ static pid_t StartUnixWorker(const std::vector<std::string>& configs, bool close
 		case -1:
 			Log(LogCritical, "cli")
 				<< "fork() failed with error code " << errno << ", \"" << Utility::FormatErrorNumber(errno) << "\"";
-			exit(EXIT_FAILURE);
+
+			try {
+				Application::InitializeBase();
+			} catch (const std::exception& ex) {
+				Log(LogCritical, "cli")
+					<< "Failed to re-initialize thread pool after forking (parent): " << DiagnosticInformation(ex);
+				exit(EXIT_FAILURE);
+			}
+
+			(void)sigprocmask(SIG_UNBLOCK, &l_UnixWorkerSignals, nullptr);
+			return -1;
 
 		case 0:
 			try {
