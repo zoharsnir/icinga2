@@ -23,6 +23,8 @@ REGISTER_APIFUNCTION(RequestCertificate, pki, &RequestCertificateHandler);
 static Value UpdateCertificateHandler(const MessageOrigin::Ptr& origin, const Dictionary::Ptr& params);
 REGISTER_APIFUNCTION(UpdateCertificate, pki, &UpdateCertificateHandler);
 
+static boost::mutex g_Mutex;
+
 Value RequestCertificateHandler(const MessageOrigin::Ptr& origin, const Dictionary::Ptr& params)
 {
 	String certText = params->Get("cert_request");
@@ -76,6 +78,8 @@ Value RequestCertificateHandler(const MessageOrigin::Ptr& origin, const Dictiona
 	}
 
 	if (signedByCA) {
+		boost::mutex::scoped_lock lock(g_Mutex);
+
 		time_t now;
 		time(&now);
 
