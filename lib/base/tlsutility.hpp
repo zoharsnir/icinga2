@@ -6,6 +6,7 @@
 #include "base/i2-base.hpp"
 #include "base/object.hpp"
 #include "base/string.hpp"
+#include "base/array.hpp"
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
