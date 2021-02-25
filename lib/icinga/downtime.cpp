@@ -223,7 +223,7 @@ bool Downtime::HasValidConfigOwner() const
 		return true;
 	}
 
-	return configOwnerHash == owner->HashDowntimeOptions();
+	return IsInEffect() || configOwnerHash == owner->HashDowntimeOptions();
 }
 
 int Downtime::GetNextDowntimeID()
