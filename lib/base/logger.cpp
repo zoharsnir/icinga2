@@ -9,6 +9,9 @@
 #include "base/objectlock.hpp"
 #include "base/context.hpp"
 #include "base/scriptglobal.hpp"
+#ifdef _WIN32
+#include "base/windowseventloglogger.hpp"
+#endif /* _WIN32 */
 #include <iostream>
 
 using namespace icinga;
@@ -28,6 +31,7 @@ REGISTER_TYPE(Logger);
 std::set<Logger::Ptr> Logger::m_Loggers;
 boost::mutex Logger::m_Mutex;
 bool Logger::m_ConsoleLogEnabled = true;
+std::atomic<bool> Logger::m_EarlyLoggingEnabled (true);
 bool Logger::m_TimestampEnabled = true;
 LogSeverity Logger::m_ConsoleLogSeverity = LogInformation;
 
@@ -156,6 +160,14 @@ LogSeverity Logger::GetConsoleLogSeverity()
 	return m_ConsoleLogSeverity;
 }
 
+void Logger::DisableEarlyLogging() {
+	m_EarlyLoggingEnabled = false;
+}
+
+bool Logger::IsEarlyLoggingEnabled() {
+	return m_EarlyLoggingEnabled;
+}
+
 void Logger::DisableTimestamp()
 {
 	m_TimestampEnabled = false;
@@ -235,6 +247,13 @@ Log::~Log()
 		 * then cout will not flush lines automatically. */
 		std::cout << std::flush;
 	}
+
+#ifdef _WIN32
+	// TODO: which severity for filtering?
+	if (Logger::IsEarlyLoggingEnabled() && entry.Severity >= Logger::GetConsoleLogSeverity()) {
+		WindowsEventLogLogger::WriteToWindowsEventLog(entry);
+	}
+#endif /* _WIN32 */
 }
 
 Log& Log::operator<<(const char *val)
