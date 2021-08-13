@@ -43,6 +43,15 @@ BOOST_AUTO_TEST_CASE(multiple)
 	BOOST_CHECK(str == "testA=123456 testB=123456");
 }
 
+BOOST_AUTO_TEST_CASE(multiline)
+{
+	Array::Ptr pd = PluginUtility::SplitPerfdata(" 'testA'=123456  'testB'=123456");
+	BOOST_CHECK(pd->GetLength() == 2);
+
+	String str = PluginUtility::FormatPerfdata(pd);
+	BOOST_CHECK(str == "testA=123456 testB=123456");
+}
+
 BOOST_AUTO_TEST_CASE(normalize)
 {
 	Array::Ptr pd = PluginUtility::SplitPerfdata("testA=2m;3;4;1;5 testB=2foobar");
