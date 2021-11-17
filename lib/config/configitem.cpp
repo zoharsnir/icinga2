@@ -704,7 +704,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 			continue;
 		}
 
-		byType[object->GetReflectionType().get()].emplace_back(object);
+		byType[object->GetReflectionType().get()].emplace_back(object.get());
 	}
 
 	WorkQueue q (Configuration::Concurrency, Configuration::Concurrency, LogNotice);
