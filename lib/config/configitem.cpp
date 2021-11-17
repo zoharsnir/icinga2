@@ -25,6 +25,8 @@
 #include <fstream>
 #include <algorithm>
 #include <random>
+#include <unordered_map>
+#include <vector>
 
 using namespace icinga;
 
@@ -693,18 +695,23 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 		}
 	}
 
-	for (const Type::Ptr& type : types) {
-		for (const ConfigItem::Ptr& item : newItems) {
-			if (!item->m_Object)
-				continue;
+	std::unordered_map<Type*, std::vector<ConfigObject*>> byType;
 
-			ConfigObject::Ptr object = item->m_Object;
+	for (auto& item : newItems) {
+		auto& object (item->m_Object);
+
+		if (!object) {
+			continue;
+		}
+
+		byType[object->GetReflectionType()].emplace_back(object);
+	}
+
+	for (const Type::Ptr& type : types) {
+		for (auto object : byType[type]) {
+#ifdef I2_DEBUG
 			Type::Ptr objectType = object->GetReflectionType();
 
-			if (objectType != type)
-				continue;
-
-#ifdef I2_DEBUG
 			Log(LogDebug, "ConfigItem")
 				<< "Activating object '" << object->GetName() << "' of type '"
 				<< objectType->GetName() << "' with priority "
