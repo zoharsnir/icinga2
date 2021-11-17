@@ -710,7 +710,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 	WorkQueue q (Configuration::Concurrency, Configuration::Concurrency, LogNotice);
 
 	for (const Type::Ptr& type : types) {
-		q.ParallelFor(byType[type], [runtimeCreated, &cookie](ConfigObject* object) {
+		q.ParallelFor(byType[type.get()], [runtimeCreated, &cookie](ConfigObject* object) {
 #ifdef I2_DEBUG
 			Type::Ptr objectType = object->GetReflectionType();
 
