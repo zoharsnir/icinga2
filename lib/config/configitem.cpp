@@ -710,7 +710,9 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 	WorkQueue q (Configuration::Concurrency, Configuration::Concurrency, LogNotice);
 
 	for (const Type::Ptr& type : types) {
-		q.ParallelFor(byType[type.get()], [runtimeCreated, &cookie](ConfigObject* object) {
+		auto& objects (byType[type.get()]);
+
+		q.ParallelFor(objects, [runtimeCreated, &cookie](ConfigObject* object) {
 #ifdef I2_DEBUG
 			Type::Ptr objectType = object->GetReflectionType();
 
@@ -724,7 +726,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 		});
 
 		q.Join();
-		byType[type] = decltype(byType[type])();
+		objects = decltype(objects)();
 
 		if (mainConfigActivation && type == lastLoggerType) {
 			/* Disable early logging configuration once the last logger type was activated. */
