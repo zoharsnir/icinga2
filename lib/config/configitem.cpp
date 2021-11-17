@@ -704,7 +704,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 			continue;
 		}
 
-		byType[object->GetReflectionType()].emplace_back(object);
+		byType[object->GetReflectionType().get()].emplace_back(object);
 	}
 
 	WorkQueue q (Configuration::Concurrency, Configuration::Concurrency, LogNotice);
@@ -724,6 +724,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 		});
 
 		q.Join();
+		byType[type] = decltype(byType[type])();
 
 		if (mainConfigActivation && type == lastLoggerType) {
 			/* Disable early logging configuration once the last logger type was activated. */
