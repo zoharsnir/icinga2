@@ -726,7 +726,8 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 		});
 
 		q.Join();
-		objects = decltype(objects)();
+		objects.clear();
+		objects.shrink_to_fit();
 
 		if (mainConfigActivation && type == lastLoggerType) {
 			/* Disable early logging configuration once the last logger type was activated. */
