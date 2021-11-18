@@ -707,8 +707,6 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 		byType[object->GetReflectionType().get()].emplace_back(object.get());
 	}
 
-	WorkQueue q (Configuration::Concurrency, Configuration::Concurrency, LogNotice);
-
 	for (const Type::Ptr& type : types) {
 		auto objects (byType.find(type.get()));
 
@@ -716,7 +714,7 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 			continue;
 		}
 
-		q.ParallelFor(objects->second, [runtimeCreated, &cookie](ConfigObject* object) {
+		for (auto object : objects->second) {
 #ifdef I2_DEBUG
 			Type::Ptr objectType = object->GetReflectionType();
 
@@ -727,9 +725,8 @@ bool ConfigItem::ActivateItems(const std::vector<ConfigItem::Ptr>& newItems, boo
 #endif /* I2_DEBUG */
 
 			object->Activate(runtimeCreated, cookie);
-		});
+		}
 
-		q.Join();
 		objects->second.clear();
 		objects->second.shrink_to_fit();
 
