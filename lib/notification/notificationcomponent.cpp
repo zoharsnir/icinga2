@@ -117,6 +117,9 @@ void NotificationComponent::NotificationTimerHandler()
 			ObjectLock olock(unstashedNotifications);
 
 			for (Dictionary::Ptr unstashedNotification : unstashedNotifications) {
+				if (!unstashedNotification)
+					continue;
+
 				try {
 					Log(LogNotice, "NotificationComponent")
 						<< "Attempting to send stashed notification '" << notificationName << "'.";
