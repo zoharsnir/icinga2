@@ -1,11 +1,7 @@
 name: Raspbian
 
 on:
-  push:
-    branches:
-      - master
-      - 'support/*'
-  pull_request: {}
+  push: {}
 
 jobs:
   raspbian:
