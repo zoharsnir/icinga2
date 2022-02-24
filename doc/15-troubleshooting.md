@@ -1630,39 +1630,23 @@ of syncing plugin binaries to your satellites and agents.
 
 #### Zones in Zones <a id="troubleshooting-cluster-config-zones-in-zones"></a>
 
-The cluster config sync works in the way that configuration put into `/etc/icinga2/zones.d` only is included when
-configured either in `/etc/icinga2/zones.d/localZoneName` or outside in `/etc/icinga2/zones.conf`.
+The cluster config sync works in a such manner that any `/etc/icinga2/zones.d/` subdirectory is included only when it is
+named after a known zone by the local `Endpoint`.
 
-If you for example add some configs in to `zones.d/satellite` and forgot to create a "Zone Inception" with defining
-the `satellite` zone in `zones.d/master` or outside in `/etc/icinga2/zones.conf`, the config compiler will not include
-this config from `zones.d/satellite` zone directory.
+If you for example add some configs in to `zones.d/satellite` and forgot to define the `satellite` zone
+in `zones.d/master` or outside in `/etc/icinga2/zones.conf`, the config compiler will not include
+this config from the `zones.d/satellite` zone directory.
 
 Since v2.11, the config compiler is only including directories where a
 zone has been configured. Otherwise, it would include renamed old zones,
 broken zones, etc. and those long-lasting bugs have been now fixed.
 
-**Doesn't work**
-
-```
-vim /etc/icinga2/zones.conf
-
-object Zone "master" {
-  endpoints = [ "icinga2-master1.localdomain", "icinga2-master2.localdomain" ]
-}
-```
-
-```
-vim /etc/icinga2/zones.d/satellite/satellite-hosts.conf
-
-object Host "agent" { ... }
-```
-
-The `agent` host object will never reach the satellite, since the master does not have the `satellite` zone configured
-either in `zones.d/master` nor outside the `zones.d` directory.
+Here are some working examples:
 
 **Works**
 
-Each instance needs to know this, and know about the endpoints first:
+Each instance needs to know its own and direct connected Icinga 2 instances `Zone` and `Endpoint` definition in order
+to successfully establish a connection with each other.
 
 ```
 vim /etc/icinga2/zones.conf
@@ -1670,21 +1654,16 @@ vim /etc/icinga2/zones.conf
 object Endpoint "icinga2-master1.localdomain" { ... }
 object Endpoint "icinga2-master2.localdomain" { ... }
 
-object Endpoint "icinga2-satellite1.localdomain" { ... }
-object Endpoint "icinga2-satellite2.localdomain" { ... }
-```
-
-Then the zone hierarchy as trust and also config sync inclusion is required.
-
-```
-vim /etc/icinga2/zones.conf
-
 object Zone "master" {
   endpoints = [ "icinga2-master1.localdomain", "icinga2-master2.localdomain" ]
 }
 
+object Endpoint "icinga2-satellite1.localdomain" { ... }
+object Endpoint "icinga2-satellite2.localdomain" { ... }
+
 object Zone "satellite" {
   endpoints = [ "icinga2-satellite1.localdomain", "icinga2-satellite1.localdomain" ]
+  parent = "master"
 }
 ```
 
@@ -1695,17 +1674,14 @@ vim /etc/icinga2/zones.conf
 
 object Endpoint "icinga2-master1.localdomain" { ... }
 object Endpoint "icinga2-master2.localdomain" { ... }
-```
-
-Then the zone hierarchy as trust and also config sync inclusion is required.
-
-```
-vim /etc/icinga2/zones.conf
 
 object Zone "master" {
   endpoints = [ "icinga2-master1.localdomain", "icinga2-master2.localdomain" ]
 }
 ```
+
+As the satellites are child zones of our master, we also have the possibility to outsource
+the satellite `Zone` and `Endpoint` definitions to the `zones.d/master` directory.
 
 ```
 mkdir /etc/icinga2/zones.d/master
@@ -1716,6 +1692,7 @@ object Endpoint "icinga2-satellite2.localdomain" { ... }
 
 object Zone "satellite" {
   endpoints = [ "icinga2-satellite1.localdomain", "icinga2-satellite1.localdomain" ]
+  parent = "master"
 }
 ```
 
@@ -1726,6 +1703,9 @@ vim /etc/icinga2/zones.d/satellite/satellite-hosts.conf
 
 object Host "agent" { ... }
 ```
+
+Keep in mind that the `agent` host object will never reach the satellite, when the master does not have the
+`satellite` zone configured either in `zones.d/master` nor outside the `zones.d` directory.
 
 That's also explained and described in the [documentation](06-distributed-monitoring.md#distributed-monitoring-scenarios-master-satellite-agents).
 
