@@ -45,6 +45,11 @@ public:
 
 	String GetEnvironmentId() const override;
 
+	inline RedisConnection::Ptr GetConnection()
+	{
+		return m_Rcon;
+	}
+
 protected:
 	void ValidateTlsProtocolmin(const Lazy<String>& lvalue, const ValidationUtils& utils) override;
 	void ValidateConnectTimeout(const Lazy<double>& lvalue, const ValidationUtils& utils) override;
