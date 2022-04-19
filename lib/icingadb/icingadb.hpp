@@ -50,6 +50,22 @@ public:
 		return m_Rcon;
 	}
 
+	template<class T>
+	static void KvsToMap(Array::Ptr&& kvs, T& map)
+	{
+		Value* key = nullptr;
+		ObjectLock oLock (kvs);
+
+		for (auto& kv : kvs) {
+			if (key) {
+				map.emplace(std::move(*key), std::move(kv));
+				key = nullptr;
+			} else {
+				key = &kv;
+			}
+		}
+	}
+
 protected:
 	void ValidateTlsProtocolmin(const Lazy<String>& lvalue, const ValidationUtils& utils) override;
 	void ValidateConnectTimeout(const Lazy<double>& lvalue, const ValidationUtils& utils) override;
